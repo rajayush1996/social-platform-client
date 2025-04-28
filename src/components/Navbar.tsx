@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -15,10 +14,12 @@ const Navbar = () => {
           <span className="text-xl font-bold text-white">ReelVibes</span>
         </Link>
         
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
           <Link to="/" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
             Home
+          </Link>
+          <Link to="/videos" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            Videos
           </Link>
           <Link to="/reels" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
             Reels
@@ -31,7 +32,6 @@ const Navbar = () => {
           </Button>
         </div>
         
-        {/* Mobile Navigation Toggle */}
         <button 
           className="md:hidden text-foreground"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -48,7 +48,6 @@ const Navbar = () => {
         </button>
       </div>
       
-      {/* Mobile Navigation Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-background border-b border-border animate-fade-in">
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
@@ -58,6 +57,13 @@ const Navbar = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Home
+            </Link>
+            <Link 
+              to="/videos" 
+              className="px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Videos
             </Link>
             <Link 
               to="/reels" 
