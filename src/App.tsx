@@ -11,6 +11,8 @@ import BlogPage from "./pages/BlogPage";
 import ReelDetail from "./pages/ReelDetail";
 import BlogDetail from "./pages/BlogDetail";
 import NotFound from "./pages/NotFound";
+import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/reels/:id" element={<ReelDetail />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

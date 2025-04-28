@@ -1,7 +1,8 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Film, BookOpen } from "lucide-react";
+import { Film, UserRound } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,8 +28,13 @@ const Navbar = () => {
           <Link to="/blog" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
             Blog
           </Link>
-          <Button className="bg-reel-purple-600 hover:bg-reel-purple-700">
-            Get Started
+          <Link to="/profile">
+            <Button variant="ghost" size="icon">
+              <UserRound className="h-5 w-5" />
+            </Button>
+          </Link>
+          <Button className="bg-reel-purple-600 hover:bg-reel-purple-700" asChild>
+            <Link to="/login">Login</Link>
           </Button>
         </div>
         
@@ -79,8 +85,17 @@ const Navbar = () => {
             >
               Blog
             </Link>
-            <Button className="bg-reel-purple-600 hover:bg-reel-purple-700 w-full">
-              Get Started
+            <Link 
+              to="/profile" 
+              className="px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Profile
+            </Link>
+            <Button className="bg-reel-purple-600 hover:bg-reel-purple-700 w-full" asChild>
+              <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                Login
+              </Link>
             </Button>
           </div>
         </div>
