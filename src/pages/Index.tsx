@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Reel, BookOpen } from "lucide-react";
+import { Film, BookOpen } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ReelCard from "@/components/reels/ReelCard";
@@ -43,7 +43,7 @@ const Index = () => {
                   asChild
                 >
                   <Link to="/reels">
-                    <Reel className="mr-2 h-5 w-5" /> Explore Reels
+                    <Film className="mr-2 h-5 w-5" /> Explore Reels
                   </Link>
                 </Button>
                 <Button 

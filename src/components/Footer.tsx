@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Reel } from "lucide-react";
+import { Film } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <Reel className="h-8 w-8 text-reel-purple-500" />
+              <Film className="h-8 w-8 text-reel-purple-500" />
               <span className="text-xl font-bold text-white">ReelVibes</span>
             </Link>
             <p className="text-sm text-foreground/70 max-w-xs">

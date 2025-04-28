@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Reel, BookOpen } from "lucide-react";
+import { Film, BookOpen } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,7 +11,7 @@ const Navbar = () => {
     <nav className="fixed w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <Reel className="h-8 w-8 text-reel-purple-500" />
+          <Film className="h-8 w-8 text-reel-purple-500" />
           <span className="text-xl font-bold text-white">ReelVibes</span>
         </Link>
         
