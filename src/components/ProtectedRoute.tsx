@@ -13,8 +13,21 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <div>Loading...</div>; // You can replace this with a proper loading component
   }
 
+  // List of public routes that don't require authentication
+  const publicRoutes = ['/', '/videos', '/reels', '/blog'];
+  
+  // If user is authenticated and tries to access login page, redirect to home
+  if (isAuthenticated && location.pathname === '/login') {
+    return <Navigate to="/" replace />;
+  }
+
+  // Allow access to public routes without authentication
+  if (publicRoutes.includes(location.pathname)) {
+    return <>{children}</>;
+  }
+
+  // For all other routes, require authentication
   if (!isAuthenticated) {
-    // Redirect to login page but save the attempted URL
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 

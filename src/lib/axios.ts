@@ -27,13 +27,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Optionally handle token refresh here
-    if (error.response && error.response.status === 401) {
-      // You can add logic to refresh token or redirect to login
-      // For now, just clear token and reload
-      localStorage.removeItem('accessToken');
-      window.location.href = '/login';
-    }
+    // Handle error without automatic redirect
     return Promise.reject(error);
   }
 );
