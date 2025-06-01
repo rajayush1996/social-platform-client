@@ -1,11 +1,19 @@
-
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Film, UserRound } from "lucide-react";
+import { Film, UserRound, LogOut } from "lucide-react";
+import { useAuth } from '@/hooks/useAuth';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/login';
+
+  // Don't show navbar on login page
+  if (isLoginPage) {
+    return null;
+  }
 
   return (
     <nav className="fixed w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -28,14 +36,27 @@ const Navbar = () => {
           <Link to="/blog" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
             Blog
           </Link>
-          <Link to="/profile">
-            <Button variant="ghost" size="icon">
-              <UserRound className="h-5 w-5" />
+          {isAuthenticated && (
+            <Link to="/profile">
+              <Button variant="ghost" size="icon">
+                <UserRound className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
+          {isAuthenticated ? (
+            <Button 
+              variant="ghost" 
+              className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+              onClick={logout}
+            >
+              <LogOut className="h-5 w-5 mr-2" />
+              Logout
             </Button>
-          </Link>
-          <Button className="bg-reel-purple-600 hover:bg-reel-purple-700" asChild>
-            <Link to="/login">Login</Link>
-          </Button>
+          ) : (
+            <Button className="bg-reel-purple-600 hover:bg-reel-purple-700" asChild>
+              <Link to="/login">Login</Link>
+            </Button>
+          )}
         </div>
         
         <button 
@@ -85,18 +106,34 @@ const Navbar = () => {
             >
               Blog
             </Link>
-            <Link 
-              to="/profile" 
-              className="px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Profile
-            </Link>
-            <Button className="bg-reel-purple-600 hover:bg-reel-purple-700 w-full" asChild>
-              <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                Login
+            {isAuthenticated && (
+              <Link 
+                to="/profile" 
+                className="px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Profile
               </Link>
-            </Button>
+            )}
+            {isAuthenticated ? (
+              <Button 
+                variant="ghost" 
+                className="text-red-500 hover:text-red-600 hover:bg-red-500/10 w-full"
+                onClick={() => {
+                  logout();
+                  setIsMenuOpen(false);
+                }}
+              >
+                <LogOut className="h-5 w-5 mr-2" />
+                Logout
+              </Button>
+            ) : (
+              <Button className="bg-reel-purple-600 hover:bg-reel-purple-700 w-full" asChild>
+                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                  Login
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       )}

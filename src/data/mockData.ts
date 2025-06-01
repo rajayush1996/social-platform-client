@@ -1,4 +1,3 @@
-
 export const reelsData = [
   {
     id: '1',
@@ -149,4 +148,43 @@ export const blogData = [
     readTime: '7 min',
     featured: false
   }
+];
+
+export const videosData = [
+  {
+    id: '1',
+    video: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    thumbnail: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81',
+    title: 'Sample Video 1',
+    author: 'Video Guru',
+    views: 1250000,
+    duration: '3:45',
+  },
+  {
+    id: '2',
+    video: 'https://www.w3schools.com/html/movie.mp4',
+    thumbnail: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    title: 'Sample Video 2',
+    author: 'Productivity Pro',
+    views: 820000,
+    duration: '2:30',
+  },
+  {
+    id: '3',
+    video: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    thumbnail: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7',
+    title: 'Sample Video 3',
+    author: 'Tech Reviewer',
+    views: 650000,
+    duration: '4:15',
+  },
+  {
+    id: '4',
+    video: 'https://www.w3schools.com/html/movie.mp4',
+    thumbnail: 'https://images.unsplash.com/photo-1543269865-cbf427effbad',
+    title: 'Sample Video 4',
+    author: 'Team Lead',
+    views: 450000,
+    duration: '3:10',
+  },
 ];
