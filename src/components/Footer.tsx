@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="flex items-center space-x-2 mb-4">
               <Film className="h-8 w-8 text-reel-purple-500" />
-              <span className="text-xl font-bold text-white">ReelVibes</span>
+              <span className="text-xl font-bold text-white">LustyHub</span>
             </Link>
             <p className="text-sm text-foreground/70 max-w-xs">
               The ultimate platform for video content creators and enthusiasts to discover, share, and engage with short-form videos and in-depth blog articles.
@@ -52,7 +52,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="text-sm text-foreground/70">
                 <span>Email: </span>
-                <a href="mailto:hello@reelvibes.com" className="hover:text-foreground transition-colors">hello@reelvibes.com</a>
+                <a href="mailto:hello@lustyhub.com" className="hover:text-foreground transition-colors">hello@lustyhub.com</a>
               </li>
               <li className="flex space-x-4 mt-4">
                 <a href="#" className="text-foreground/70 hover:text-foreground transition-colors">
@@ -77,7 +77,7 @@ const Footer = () => {
         
         <div className="mt-12 pt-8 border-t border-border/30 text-center">
           <p className="text-sm text-foreground/60">
-            &copy; {new Date().getFullYear()} ReelVibes. All rights reserved.
+            &copy; {new Date().getFullYear()} LustyHub. All rights reserved.
           </p>
         </div>
       </div>
