@@ -90,13 +90,15 @@ export interface Stats {
 }
 
 export interface BaseContent {
-  _id: string;
+  _id?: string;
   title: string;
   description: string;
-  categoryId: Category;
-  stats: Stats;
+  categoryId?: Category;
+  stats?: Stats;
   createdAt: string;
   updatedAt: string;
+  id?: string;
+  mediaFileUrl?: string;
 }
 
 export interface Blog extends BaseContent {
@@ -130,11 +132,11 @@ export interface Video {
     url: string;
   };
   duration: string;
-  user: any;
+  user: unknown;
 }
 
 export interface Reel extends BaseContent {
-  reelSpecific: {
+  reelSpecific?: {
     duration: string;
     thumbnailMetadata: MediaMeta;
     contentMetadata: MediaMeta;

@@ -13,6 +13,7 @@ const avatar = "https://ui-avatars.com/api/?name=User&background=6c47ff&color=ff
 const fallbackImage = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80";
 
 const ReelCard = ({ reel }: { reel: Reel }) => {
+  console.log("🚀 ~ ReelCard ~ reel:", reel);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(reel.stats?.likes || 0);
   const [showComments, setShowComments] = useState(false);
@@ -85,7 +86,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
               )}
               <video
                 ref={videoRef}
-                src={reel.reelSpecific?.contentMetadata?.url || ''}
+                src={reel.mediaFileUrl || ''}
                 className="w-full h-full object-cover rounded-t-[2rem]"
                 autoPlay
                 loop
@@ -235,7 +236,8 @@ const ReelsPage = () => {
     );
   }
 
-  if (!data || !data?.results || data?.results.length === 0) {
+  console.log("🚀 ~ ReelsPage ~ data:", data);
+  if (!data || !data?.pages || data?.pages[0].results.length === 0) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
@@ -246,6 +248,7 @@ const ReelsPage = () => {
   }
 
   const reels = data?.pages.flatMap(page => page.results) || [];
+  console.log("🚀 ~ ReelsPage ~ reels:", reels)
 
   return (
     <Layout>
@@ -253,7 +256,7 @@ const ReelsPage = () => {
       <div className="min-h-[calc(100vh-4rem)] bg-background flex flex-col items-center pt-24 px-2">
         <div className="w-full max-w-md flex flex-col gap-10">
           {reels.map((reel) => (
-            <ReelCard key={reel.id} reel={reel as any} />
+            <ReelCard key={reel.id} reel={reel} />
           ))}
           <div ref={loader} className="flex justify-center py-8 border-2 border-dashed border-reel-purple-500 bg-black/10">
             {isFetchingNextPage && (
