@@ -130,6 +130,7 @@ export interface Video {
     url: string;
   };
   duration: string;
+  user: any;
 }
 
 export interface Reel extends BaseContent {

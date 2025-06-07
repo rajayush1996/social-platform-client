@@ -38,6 +38,9 @@ const VideoDetail = () => {
     ? `${(video.views / 1000).toFixed(1)}K`
     : video.views;
 
+  // Default thumbnail if none is provided
+  const defaultThumbnail = 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81';
+
   return (
     <Layout>
       <div className="flex flex-col items-center justify-center">
@@ -48,7 +51,7 @@ const VideoDetail = () => {
           <div className="w-full aspect-video bg-black rounded-xl overflow-hidden mb-6">
             <video
               src={video.mediaFile.url}
-              poster={video.thumbnail.url}
+              poster={video.thumbnail?.url || defaultThumbnail}
               className="w-full h-full object-contain rounded-xl"
               controls
               autoPlay
@@ -56,9 +59,9 @@ const VideoDetail = () => {
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">{video.title}</h1>
           <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-            <span>By {video.author}</span>
+            <span>By {video?.user?.username || 'Unknown Author'}</span>
             <span>• {formattedViews} views</span>
-            <span>• {video.duration}</span>
+            <span>• {video.duration || '0:00'}</span>
           </div>
         </div>
       </div>
