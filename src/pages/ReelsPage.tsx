@@ -6,6 +6,7 @@ import ReelsNavigation from '@/components/ReelsNavigation';
 import { useReels } from '@/hooks/useReel';
 import Layout from '@/components/Layout';
 import { Reel } from '@/types/api.types';
+import { Link } from 'react-router-dom';
 
 // Use an online placeholder avatar
 const avatar = "https://ui-avatars.com/api/?name=User&background=6c47ff&color=fff";
@@ -115,16 +116,16 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
         <div className="flex items-center gap-4 px-6 py-4 bg-black/20 backdrop-blur-lg rounded-b-[2rem]">
           <img
             src={avatar}
-            alt={reel.categoryId.name}
+            alt={reel?.categoryId?.name}
             className="w-11 h-11 rounded-full border-2 border-reel-purple-500 shadow-lg"
           />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-white/90 text-sm">{reel.categoryId.name}</span>
-              <span className="text-xs text-gray-400">• {new Date(reel.createdAt).toLocaleDateString()}</span>
+              <span className="font-semibold text-white/90 text-sm">{reel?.categoryId?.name}</span>
+              <span className="text-xs text-gray-400">• {new Date(reel?.createdAt).toLocaleDateString()}</span>
             </div>
-            <div className="text-sm text-gray-300 mt-0.5">{reel.title}</div>
-            <div className="text-sm text-gray-400 mt-0.5">{reel.description}</div>
+            <div className="text-sm text-gray-300 mt-0.5">{reel?.title}</div>
+            <div className="text-sm text-gray-400 mt-0.5">{reel?.description}</div>
           </div>
           {/* Right action buttons */}
           <div className="flex flex-col items-center gap-4">
@@ -144,7 +145,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
               className="flex flex-col items-center gap-1"
             >
               <MessageCircle className="h-7 w-7 text-white" />
-              <span className="text-xs text-white/80">{comments.length}</span>
+              <span className="text-xs text-white/80">{comments?.length}</span>
             </button>
             <button className="flex flex-col items-center gap-1">
               <Share2 className="h-7 w-7 text-white" />
@@ -169,20 +170,20 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
             </form>
             <div className="space-y-4">
               {comments.map((comment) => (
-                <div key={comment.id} className="flex gap-3">
+                <div key={comment?.id} className="flex gap-3">
                   <img
-                    src={comment.avatar}
-                    alt={comment.user}
+                    src={comment?.avatar}
+                    alt={comment?.user}
                     className="w-8 h-8 rounded-full"
                   />
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-white/90 text-sm">
-                        {comment.user}
+                        {comment?.user}
                       </span>
-                      <span className="text-xs text-gray-400">{comment.time}</span>
+                      <span className="text-xs text-gray-400">{comment?.time}</span>
                     </div>
-                    <p className="text-sm text-gray-300">{comment.text}</p>
+                    <p className="text-sm text-gray-300">{comment?.text}</p>
                   </div>
                 </div>
               ))}
@@ -228,7 +229,17 @@ const ReelsPage = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">Failed to load reels. Please try again later.</span>
+          <span className="text-lg text-red-500">Failed to load reels. Please try again later.</span>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!data || !data?.results || data?.results.length === 0) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+          <span className="text-lg text-muted-foreground">No reels available.</span>
         </div>
       </Layout>
     );
@@ -242,7 +253,7 @@ const ReelsPage = () => {
       <div className="min-h-[calc(100vh-4rem)] bg-background flex flex-col items-center pt-24 px-2">
         <div className="w-full max-w-md flex flex-col gap-10">
           {reels.map((reel) => (
-            <ReelCard key={reel._id} reel={reel} />
+            <ReelCard key={reel.id} reel={reel as any} />
           ))}
           <div ref={loader} className="flex justify-center py-8 border-2 border-dashed border-reel-purple-500 bg-black/10">
             {isFetchingNextPage && (
