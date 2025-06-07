@@ -22,7 +22,13 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   // Allow access to public routes without authentication
-  if (publicRoutes.includes(location.pathname)) {
+  // Check if the current path starts with any of the public routes
+  const isPublicRoute = publicRoutes.some(route => 
+    location.pathname === route || 
+    location.pathname.startsWith(`${route}/`)
+  );
+
+  if (isPublicRoute) {
     return <>{children}</>;
   }
 

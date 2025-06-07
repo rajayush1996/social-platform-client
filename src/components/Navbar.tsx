@@ -37,22 +37,23 @@ const Navbar = () => {
             Blog
           </Link>
           {isAuthenticated && (
-            <Link to="/profile">
-              <Button variant="ghost" size="icon">
-                <UserRound className="h-5 w-5" />
+            <>
+              <Link to="/profile">
+                <Button variant="ghost" size="icon">
+                  <UserRound className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Button 
+                variant="ghost" 
+                className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                onClick={logout}
+              >
+                <LogOut className="h-5 w-5 mr-2" />
+                Logout
               </Button>
-            </Link>
+            </>
           )}
-          {isAuthenticated ? (
-            <Button 
-              variant="ghost" 
-              className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
-              onClick={logout}
-            >
-              <LogOut className="h-5 w-5 mr-2" />
-              Logout
-            </Button>
-          ) : (
+          {!isAuthenticated && (
             <Button className="bg-reel-purple-600 hover:bg-reel-purple-700" asChild>
               <Link to="/login">Login</Link>
             </Button>
@@ -107,27 +108,28 @@ const Navbar = () => {
               Blog
             </Link>
             {isAuthenticated && (
-              <Link 
-                to="/profile" 
-                className="px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Profile
-              </Link>
+              <>
+                <Link 
+                  to="/profile" 
+                  className="px-3 py-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+                <Button 
+                  variant="ghost" 
+                  className="text-red-500 hover:text-red-600 hover:bg-red-500/10 w-full"
+                  onClick={() => {
+                    logout();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="h-5 w-5 mr-2" />
+                  Logout
+                </Button>
+              </>
             )}
-            {isAuthenticated ? (
-              <Button 
-                variant="ghost" 
-                className="text-red-500 hover:text-red-600 hover:bg-red-500/10 w-full"
-                onClick={() => {
-                  logout();
-                  setIsMenuOpen(false);
-                }}
-              >
-                <LogOut className="h-5 w-5 mr-2" />
-                Logout
-              </Button>
-            ) : (
+            {!isAuthenticated && (
               <Button className="bg-reel-purple-600 hover:bg-reel-purple-700 w-full" asChild>
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   Login
