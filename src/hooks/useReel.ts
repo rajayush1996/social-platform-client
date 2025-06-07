@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import axiosInstance from '@/lib/axios';
 import { API_CONFIG } from '@/config/api.config';
-import type { Reel, Comment } from '@/types/api.types';
+import type { Reel as ReelType, Comment } from '@/types/api.types';
 
 interface ReelListParams {
   page?: number;
@@ -37,6 +37,26 @@ export const useReels = (params: ReelListParams = {}) => {
     },
   });
 };
+
+interface Reel {
+  id: string;
+  thumbnailId: string;
+  mediaFileId: string;
+  title: string;
+  description: string;
+  category: string;
+  mediaType: string;
+  userId: string;
+  views: number;
+  status: string;
+  reviewedBy: string;
+  reviewedAt: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  thumbnailUrl: string;
+  mediaFileUrl: string;
+}
 
 export const useReel = (id: string) => {
   return useQuery({
