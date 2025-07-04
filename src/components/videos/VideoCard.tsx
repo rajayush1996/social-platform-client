@@ -27,6 +27,7 @@ const VideoCard = ({ id, thumbnail, title, author, views, duration }: VideoCardP
             src={thumbnail} 
             alt={title} 
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            crossOrigin="anonymous"
           />
           
           {/* Play Button Overlay */}
