@@ -82,7 +82,7 @@ export function TrendingReels({ reels }: { reels: any[] }) {
                   size="icon"
                   className="bg-pink-500 hover:bg-pink-600 text-white rounded-full"
                   onClick={() => {
-                    navigate(`/reels/${v.id}`);
+                    navigate(`/reels`);
                   }}
                 >
                   <Play size={20} />
