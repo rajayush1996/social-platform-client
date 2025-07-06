@@ -54,7 +54,7 @@ const VideoDetail = () => {
               poster={video.thumbnail?.url || defaultThumbnail}
               className="w-full h-full object-contain rounded-xl"
               controls
-              autoPlay
+              autoPlay={false}
             />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">{video.title}</h1>

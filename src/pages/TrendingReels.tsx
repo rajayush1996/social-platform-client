@@ -72,7 +72,7 @@ export function TrendingReels({ reels }: { reels: any[] }) {
             {reels.map((v, idx) => (
               <div
                 key={idx}
-                className="w-full sm:min-w-[260px] md:w-[26px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg"
+                className="w-full sm:min-w-[260px] md:w-[26px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg ml-[-30px]"
               >
                 <img
                   src={v?.thumbnailDetails?.url}
