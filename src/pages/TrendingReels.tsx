@@ -45,7 +45,7 @@ export function TrendingReels({ reels }: { reels: any[] }) {
   };
 
   return (
-    <section className="py-12 px-4 text-white relative">
+    <section className="py-12 mx-4 text-white relative">
       <div className="mx-auto">
         {/* Title */}
         <div className="flex justify-between items-center mb-5 px-2">
@@ -72,7 +72,7 @@ export function TrendingReels({ reels }: { reels: any[] }) {
             {reels.map((v, idx) => (
               <div
                 key={idx}
-                className="w-full sm:min-w-[260px] md:w-[26px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg ml-0 md:ml-[-30px] "
+                className="w-full sm:min-w-[260px] md:w-[26px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg "
               >
                 <img
                   src={v?.thumbnailDetails?.url}
