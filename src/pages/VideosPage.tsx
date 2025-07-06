@@ -57,7 +57,7 @@ const VideosPage = () => {
               <VideoCard 
                 key={video._id}
                 id={video._id}
-                thumbnail={video.thumbnail?.url || 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81'}
+                thumbnail={video?.thumbnail?.url || 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81'}
                 title={video.title || 'Untitled Video'}
                 author={video.author || 'Unknown Author'}
                 views={video.views || 0}

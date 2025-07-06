@@ -28,12 +28,28 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
     <section className="py-12 mx-4">
       <div className="mx-auto relative rounded-2xl overflow-hidden shadow-lg h-[500px]">
         {/* Background image */}
-        <img
-          src={videos[current]?.thumbnailDetails?.url}
-          alt={videos[current]?.title}
-          crossOrigin="anonymous"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {videos[current]?.thumbnailDetails?.url ? (
+          <img
+            src={videos[current].thumbnailDetails.url}
+            alt={videos[current]?.title}
+            crossOrigin="anonymous"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : videos[current]?.videoUrl ? (
+          <video
+            src={videos[current].videoUrl}
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        ) : (
+          <div className="absolute inset-0 bg-black flex items-center justify-center text-white text-xl">
+            No Preview Available
+          </div>
+        )}
+
 
         {/* Bottom gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
@@ -69,9 +85,8 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
           {videos.map((_, idx) => (
             <div
               key={idx}
-              className={`w-3 h-3 rounded-full ${
-                current === idx ? "bg-pink-500" : "bg-white/40"
-              }`}
+              className={`w-3 h-3 rounded-full ${current === idx ? "bg-pink-500" : "bg-white/40"
+                }`}
             />
           ))}
         </div>
