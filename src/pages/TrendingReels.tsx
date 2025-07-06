@@ -45,82 +45,86 @@ export function TrendingReels({ reels }: { reels: any[] }) {
   };
 
   return (
-    <section className="py-12 px-4 bg-[#131018] text-white relative overflow-hidden">
-      <div className="max-w-6xl mx-auto relative">
-        <div className="flex justify-between items-center mb-5">
+    <section className="py-12 px-4 text-white relative">
+      <div className="mx-auto">
+        {/* Title */}
+        <div className="flex justify-between items-center mb-5 px-2">
           <h2 className="text-2xl font-bold">Trending Reels</h2>
           <a href="/reels" className="text-pink-400 text-sm hover:underline">View All Reels</a>
         </div>
 
-        {/* Left Arrow Outside */}
-        <button
-          onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full z-20 bg-pink-600 hover:bg-pink-500 text-white p-2 rounded-full shadow-lg ring-2 ring-white/10"
-        >
-          <ChevronLeft size={20} />
-        </button>
+        {/* Reels container with inner buttons */}
+        <div className="div">
+          <div
+            ref={scrollRef}
+            className=" flex gap-6 overflow-x-auto scroll-smooth px-4 md:px-10 hide-scrollbar"
+          >
 
-        <div
-          ref={scrollRef}
-          className="flex gap-6 overflow-x-scroll scroll-smooth px-2 hide-scrollbar"
-        >
-          {reels.map((v, idx) => (
-            <div
-              key={idx}
-              className="min-w-[260px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg"
+            {/* Left Button inside scroll area */}
+            <button
+              onClick={() => scroll("left")}
+              className="absolute left-[-20px] top-1/2 -translate-y-1/2 z-10 bg-pink-600 hover:bg-pink-500 text-white p-2 rounded-full shadow-lg ring-2 ring-white/10"
             >
-              <img
-                src={v?.thumbnailDetails?.url}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                alt="Thumbnail"
-                crossOrigin="anonymous"
-              />
+              <ChevronLeft size={20} />
+            </button>
 
-              {/* Play overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition">
-                <Button
-                  size="icon"
-                  className="bg-pink-500 hover:bg-pink-600 text-white rounded-full"
-                  onClick={() => {
-                    navigate(`/reels`);
-                  }}
-                >
-                  <Play size={20} />
-                </Button>
-              </div>
-
-              {/* Mute toggle */}
+            {/* Reel Cards */}
+            {reels.map((v, idx) => (
               <div
-                onClick={() => toggleMute(idx)}
-                className="absolute top-2 right-2 bg-black/60 rounded-full p-1 cursor-pointer"
-                title={muteStates[idx] ? "Unmute" : "Mute"}
+                key={idx}
+                className="w-full sm:min-w-[260px] md:w-[26px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg"
               >
-                {muteStates[idx] ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              </div>
+                <img
+                  src={v?.thumbnailDetails?.url}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  alt="Thumbnail"
+                  crossOrigin="anonymous"
+                />
 
-              {/* Info text */}
-              {v.title && (
-                <div className="absolute bottom-2 left-2 text-sm">
-                  <div className="font-semibold">{v.title}</div>
-                  <div className="text-xs text-zinc-300">{v.views}</div>
+                {/* Play Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition">
+                  <Button
+                    size="icon"
+                    className="bg-pink-500 hover:bg-pink-600 text-white rounded-full"
+                    onClick={() => navigate(`/reels`)}
+                  >
+                    <Play size={20} />
+                  </Button>
                 </div>
-              )}
 
-              {/* Duration */}
-              <div className="absolute bottom-2 right-2 text-xs bg-black/70 px-2 py-0.5 rounded text-white">
-                {v?.reelSpecific?.duration}
+                {/* Mute toggle */}
+                <div
+                  onClick={() => setMuteStates((prev) => prev.map((m, i) => (i === idx ? !m : m)))}
+                  className="absolute top-2 right-2 bg-black/60 rounded-full p-1 cursor-pointer"
+                  title={muteStates[idx] ? "Unmute" : "Mute"}
+                >
+                  {muteStates[idx] ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                </div>
+
+                {/* Info */}
+                {v.title && (
+                  <div className="absolute bottom-2 left-2 text-sm">
+                    <div className="font-semibold">{v.title}</div>
+                    <div className="text-xs text-zinc-300">{v.views}</div>
+                  </div>
+                )}
+
+                {/* Duration */}
+                <div className="absolute bottom-2 right-2 text-xs bg-black/70 px-2 py-0.5 rounded text-white">
+                  {v?.reelSpecific?.duration}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
 
-        {/* Right Arrow Outside */}
-        <button
-          onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full z-20 bg-pink-600 hover:bg-pink-500 text-white p-2 rounded-full shadow-lg ring-2 ring-white/10"
-        >
-          <ChevronRight size={20} />
-        </button>
+            {/* Right Button inside scroll area */}
+            <button
+              onClick={() => scroll("right")}
+              className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 z-10 bg-pink-600 hover:bg-pink-500 text-white p-2 rounded-full shadow-lg ring-2 ring-white/10"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

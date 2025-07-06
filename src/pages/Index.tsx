@@ -150,6 +150,7 @@ import { FeaturedBlogs } from "./FeaturedBlogs";
 import { LatestBlogs } from "./LatestBlogs";
 import { NoContentFallback } from "./NoContentFallback";
 import HeroSlider from "./HeroSlider";
+import MonetizeBanner from "@/components/MonetizeBanner";
 
 export default function Index() {
   const { data, isLoading, isError } = useHomeContent();
@@ -178,17 +179,22 @@ export default function Index() {
 
   return (
     <Layout>
-      {/* <Navbar /> */}
-      <HeroSlider videos={data.featured.videos} />
-      <TrendingReels reels={data.featured.reels} />
-      {/* <HeroBanner /> */}
-      <FeaturedVideos videos={data.featured.videos} />
-      <FeaturedBlogs blogs={data.featured.blogs} />
-      <LatestBlogs blogs={data.latest.blogs} />
-
-      {!data.featured.videos.length &&
+      <section className="md:mx-12">
+        <MonetizeBanner />
+        <HeroSlider videos={data.featured.videos} />
+        <TrendingReels reels={data.featured.reels} />
+        {/* <HeroBanner /> */}
+        <FeaturedVideos videos={data.featured.videos} />
+        <FeaturedBlogs blogs={data.featured.blogs} />
+        <LatestBlogs blogs={data.latest.blogs} />
+        {!data.featured.videos.length &&
         !data.featured.blogs.length &&
         !data.latest.blogs.length && <NoContentFallback />}
+      </section>
+      {/* <Navbar /> */}
+
+
+      
     </Layout>
   );
 }

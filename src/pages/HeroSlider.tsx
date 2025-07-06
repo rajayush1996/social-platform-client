@@ -25,8 +25,8 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
   const prev = () => setCurrent((current - 1 + total) % total);
 
   return (
-    <section className="py-12 px-4">
-      <div className="max-w-6xl mx-auto relative rounded-2xl overflow-hidden shadow-lg h-[500px]">
+    <section className="py-12">
+      <div className="mx-auto relative rounded-2xl overflow-hidden shadow-lg h-[500px] mx-4">
         {/* Background image */}
         <img
           src={videos[current]?.thumbnailDetails?.url}
