@@ -63,7 +63,7 @@ export function TrendingReels({ reels }: { reels: any[] }) {
             {/* Left Button inside scroll area */}
             <button
               onClick={() => scroll("left")}
-              className="absolute left-[-20px] top-1/2 -translate-y-1/2 z-10 bg-pink-600 hover:bg-pink-500 text-white p-2 rounded-full shadow-lg ring-2 ring-white/10"
+              className="absolute md:left-[-20px] top-1/2 -translate-y-1/2 z-10 bg-pink-600 hover:bg-pink-500 text-white p-2 rounded-full shadow-lg ring-2 ring-white/10"
             >
               <ChevronLeft size={20} />
             </button>
@@ -72,7 +72,7 @@ export function TrendingReels({ reels }: { reels: any[] }) {
             {reels.map((v, idx) => (
               <div
                 key={idx}
-                className="w-full sm:min-w-[260px] md:w-[26px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg ml-[-30px]"
+                className="w-full sm:min-w-[260px] md:w-[26px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg ml-0 md:ml-[-30px] "
               >
                 <img
                   src={v?.thumbnailDetails?.url}
@@ -119,7 +119,7 @@ export function TrendingReels({ reels }: { reels: any[] }) {
             {/* Right Button inside scroll area */}
             <button
               onClick={() => scroll("right")}
-              className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 z-10 bg-pink-600 hover:bg-pink-500 text-white p-2 rounded-full shadow-lg ring-2 ring-white/10"
+              className="absolute right-1 md:right-[-20px] right-8 top-1/2 -translate-y-1/2 z-10 bg-pink-600 hover:bg-pink-500 text-white p-2 rounded-full shadow-lg ring-2 ring-white/10"
             >
               <ChevronRight size={20} />
             </button>
