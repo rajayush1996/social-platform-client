@@ -3,11 +3,22 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useVideo } from '@/hooks/useVideo';
 import Layout from '@/components/Layout';
+import { useRef, useState } from 'react';
 
 const VideoDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: video, isLoading, isError } = useVideo(id!);
+  const videoRef = useRef(null);
+  const [duration, setDuration] = useState(null);
+
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (video) {
+      const seconds = video.duration;
+      setDuration(seconds);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -52,6 +63,7 @@ const VideoDetail = () => {
             <video
               src={video.mediaFile.url}
               poster={video.thumbnail?.url || defaultThumbnail}
+              onLoadedMetadata={handleLoadedMetadata}
               className="w-full h-full object-contain rounded-xl"
               controls
               autoPlay={false}
@@ -61,7 +73,7 @@ const VideoDetail = () => {
           <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
             <span>By {video?.user?.username || 'Unknown Author'}</span>
             <span>• {formattedViews} views</span>
-            <span>• {video.duration || '0:00'}</span>
+            <span>• {video.duration || duration}</span>
           </div>
         </div>
       </div>
