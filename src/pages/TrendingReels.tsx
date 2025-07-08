@@ -72,14 +72,21 @@ export function TrendingReels({ reels }: { reels: any[] }) {
             {reels.map((v, idx) => (
               <div
                 key={idx}
-                className="w-full sm:min-w-[260px] md:w-[26px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg "
+                className="min-w-full sm:min-w-[260px] md:min-w-[260px] h-[400px] relative group rounded-xl overflow-hidden bg-zinc-800 shadow-lg"
               >
-                <img
-                  src={v?.thumbnailDetails?.url}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  alt="Thumbnail"
-                  crossOrigin="anonymous"
-                />
+
+                {v?.thumbnailDetails?.url ? (
+                  <img
+                    src={v.thumbnailDetails.url}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    alt="Thumbnail"
+                    crossOrigin="anonymous"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-400 text-lg font-semibold">
+                    No Preview
+                  </div>
+                )}
 
                 {/* Play Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition">
