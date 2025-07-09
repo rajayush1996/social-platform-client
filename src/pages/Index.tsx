@@ -180,7 +180,7 @@ export default function Index() {
   return (
     <Layout>
       <section className="md:mx-12">
-        <MonetizeBanner />
+        {/* <MonetizeBanner /> */}
         <HeroSlider videos={data.featured.videos} />
         <TrendingReels reels={data.featured.reels} />
         {/* <HeroBanner /> */}

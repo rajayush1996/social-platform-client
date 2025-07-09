@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Share2, Play, Pause, Loader2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Play, Pause, Loader2, Maximize } from 'lucide-react';
 import ReelsNavigation from '@/components/ReelsNavigation';
 import { useReels } from '@/hooks/useReel';
 import Layout from '@/components/Layout';
@@ -70,6 +70,24 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
       <div className="relative z-20">
         {/* Larger Video area */}
         <div className="relative w-full h-[36rem] bg-black flex items-center justify-center">
+          <button
+            className="absolute top-4 right-4 z-30 bg-black/60 hover:bg-black/80 rounded-full p-2 transition"
+            title="Fullscreen"
+            type="button"
+            onClick={() => {
+              if (videoRef.current) {
+                if (videoRef.current.requestFullscreen) {
+                  videoRef.current.requestFullscreen();
+                } else if ((videoRef.current as any).webkitRequestFullscreen) {
+                  (videoRef.current as any).webkitRequestFullscreen();
+                } else if ((videoRef.current as any).msRequestFullscreen) {
+                  (videoRef.current as any).msRequestFullscreen();
+                }
+              }
+            }}
+          >
+            <Maximize className="h-5 w-5 text-white" />
+          </button>
           {videoError ? (
             <div className="flex flex-col items-center justify-center w-full h-full">
               <img src={fallbackImage} alt="Video unavailable" className="w-full h-full object-cover rounded-t-[2rem]" />
@@ -135,9 +153,8 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
               className="flex flex-col items-center gap-1"
             >
               <Heart
-                className={`h-7 w-7 transition-all duration-200 ${
-                  liked ? 'fill-red-500 text-red-500 scale-110' : 'text-white'
-                }`}
+                className={`h-7 w-7 transition-all duration-200 ${liked ? 'fill-red-500 text-red-500 scale-110' : 'text-white'
+                  }`}
               />
               <span className="text-xs text-white/80">{likeCount}</span>
             </button>
@@ -196,23 +213,42 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
   );
 };
 
-const ReelsPage = () => {
-  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useReels();
-  const loader = useRef<HTMLDivElement | null>(null);
 
-  // Infinite scroll logic
+function ReelsPage() {
+  const loaderRef = useRef<HTMLDivElement>(null);
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useReels();
+
+  const reels = data?.pages.flatMap(p => p.results) ?? [];
+    console.log("🚀 ~ ReelsPage ~ isFetchingNextPage:", isFetchingNextPage);
+
+  // Set up observer *once* on mount
   useEffect(() => {
-    const observer = new window.IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+    const node = loaderRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       },
-      { threshold: 1 }
+      {
+        // start loading when loader is within 200px of viewport
+        rootMargin: '200px',
+        threshold: 0, 
+      }
     );
-    if (loader.current) observer.observe(loader.current);
+
+    observer.observe(node);
     return () => {
-      if (loader.current) observer.unobserve(loader.current);
+      observer.unobserve(node);
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
@@ -220,7 +256,7 @@ const ReelsPage = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">Loading reels...</span>
+          Loading reels…
         </div>
       </Layout>
     );
@@ -230,49 +266,47 @@ const ReelsPage = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-red-500">Failed to load reels. Please try again later.</span>
+          Failed to load reels.
         </div>
       </Layout>
     );
   }
 
-  console.log("🚀 ~ ReelsPage ~ data:", data);
-  if (!data || !data?.pages || data?.pages[0].results.length === 0) {
+  if (reels.length === 0) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">No reels available.</span>
+          No reels available.
         </div>
       </Layout>
     );
   }
-
-  const reels = data?.pages.flatMap(page => page.results) || [];
-  console.log("🚀 ~ ReelsPage ~ reels:", reels)
 
   return (
     <Layout>
       <ReelsNavigation />
-      <div className="min-h-[calc(100vh-4rem)] bg-background flex flex-col items-center pt-24 px-2">
+      <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center pt-24 px-2">
         <div className="w-full max-w-md flex flex-col gap-10">
           {reels.map((reel) => (
             <ReelCard key={reel.id} reel={reel} />
           ))}
-          <div ref={loader} className="flex justify-center py-8 border-2 border-dashed border-reel-purple-500 bg-black/10">
-            {isFetchingNextPage && (
-              <div className="text-reel-purple-500 animate-pulse">Loading more reels...</div>
-            )}
-            {!hasNextPage && reels.length > 0 && (
-              <div className="text-muted-foreground">No more reels to show.</div>
-            )}
-            {reels.length === 0 && (
-              <div className="text-muted-foreground">No reels available at the moment.</div>
-            )}
+
+          {/* This is the “sentinel” our observer watches */}
+          <div
+            ref={loaderRef}
+            className="flex justify-center py-8 border-dashed border-2 border-reel-purple-500"
+          >
+            {isFetchingNextPage
+              ? <span>Loading more…</span>
+              : !hasNextPage
+                ? <span>You’re all caught up!</span>
+                : null}
           </div>
         </div>
       </div>
     </Layout>
   );
-};
+}
+
 
 export default ReelsPage;

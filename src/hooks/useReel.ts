@@ -13,8 +13,9 @@ interface ReelListParams {
 
 interface ReelListResponse {
   results: Reel[];
-  page: number;
+  skip: number;
   limit: number;
+  hasMore: boolean;
   totalPages: number;
   totalResults: number;
 }
@@ -22,21 +23,25 @@ interface ReelListResponse {
 export const useReels = (params: ReelListParams = {}) => {
   return useInfiniteQuery<ReelListResponse>({
     queryKey: ['reels', params],
-    initialPageParam: 1,
-    queryFn: async ({ pageParam }) => {
-      const response = await axiosInstance.get(API_CONFIG.ENDPOINTS.USER.REELS, { 
-        params: { ...params, page: pageParam } 
+    // start with skip=0
+    initialPageParam: 0,
+    queryFn: async ({ pageParam = 0 }) => {
+      // pass skip and limit to your API
+      const response = await axiosInstance.get(API_CONFIG.ENDPOINTS.USER.REELS, {
+        params: { ...params, skip: pageParam, limit: params.limit ?? 10 },
       });
       return response.data.data;
     },
     getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) {
-        return lastPage.page + 1;
+      // if the API says there’s more, schedule the next skip
+      if (lastPage.hasMore) {
+        return lastPage.skip + lastPage.limit;
       }
       return undefined;
     },
   });
 };
+
 
 interface Reel {
   id: string;
