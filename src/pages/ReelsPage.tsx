@@ -180,7 +180,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
                 value={commentInput}
                 onChange={(e) => setCommentInput(e.target.value)}
                 placeholder="Add a comment..."
-                className="flex-1 bg-black/30 text-white placeholder-gray-400 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-reel-purple-500"
+                className="flex-1 bg-black/30 text-white placeholder-gray-400 rounded-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-reel-purple-500"
               />
               <Button type="submit" size="sm" className="rounded-full">
                 Post

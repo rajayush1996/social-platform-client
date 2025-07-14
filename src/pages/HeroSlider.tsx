@@ -8,7 +8,6 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
   const total = videos.length;
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
 
   const next = () => setCurrent((c) => (c + 1) % total);
@@ -26,22 +25,6 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
     clearInterval(timerRef.current);
     timerRef.current = setInterval(next, 5000);
   };
-
-  // whenever current slide changes, reset the videoRef
-  useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
-
-    // wait until metadata is loaded, then jump to mid
-    const onLoaded = () => {
-      vid.currentTime = vid.duration / 2;
-      vid.removeEventListener("loadedmetadata", onLoaded);
-    };
-    vid.addEventListener("loadedmetadata", onLoaded);
-
-    // ensure it starts from that point
-    vid.play().catch(() => {});
-  }, [current, videos]);
 
   const slide = videos[current];
 
@@ -63,7 +46,6 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
           />
         ) : slide?.mediaDetails?.url ? (
           <video
-            ref={videoRef}
             src={slide.mediaDetails.url}
             className="absolute inset-0 w-full h-full object-cover"
             autoPlay
@@ -87,7 +69,9 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
             {slide?.title}
           </h2>
           {slide?.subtitle && (
-            <p className="text-lg mb-4 text-white/90">{slide.subtitle}</p>
+            <p className="text-lg mb-4 text-white/90">
+              {slide.subtitle}
+            </p>
           )}
           <Button
             className="bg-pink-500 hover:bg-pink-600"
