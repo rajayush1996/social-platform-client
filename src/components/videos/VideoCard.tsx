@@ -39,7 +39,7 @@ const VideoCard = ({
     if (!vid) return;
     const onLoadedMeta = () => {
       const mid = vid.duration / 2;
-      const end = Math.min(mid + 10, vid.duration);
+      const end = Math.min(mid + 5, vid.duration);
       setStopTime(end);
       vid.removeEventListener('loadedmetadata', onLoadedMeta);
     };

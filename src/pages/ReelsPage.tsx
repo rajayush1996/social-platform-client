@@ -13,7 +13,6 @@ const avatar = "https://ui-avatars.com/api/?name=User&background=6c47ff&color=ff
 const fallbackImage = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80";
 
 const ReelCard = ({ reel }: { reel: Reel }) => {
-  console.log("🚀 ~ ReelCard ~ reel:", reel);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(reel.stats?.likes || 0);
   const [showComments, setShowComments] = useState(false);
@@ -226,7 +225,6 @@ function ReelsPage() {
   } = useReels();
 
   const reels = data?.pages.flatMap(p => p.results) ?? [];
-    console.log("🚀 ~ ReelsPage ~ isFetchingNextPage:", isFetchingNextPage);
 
   // Set up observer *once* on mount
   useEffect(() => {

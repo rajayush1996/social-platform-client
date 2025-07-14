@@ -132,7 +132,9 @@ export interface Video {
     url: string;
   };
   duration: string;
-  user: unknown;
+  user?: {
+    username: string;
+  };
   mediaDetails?: {
     url: string;
   }
@@ -147,6 +149,7 @@ export interface Video {
     views: number;
   };
   id?: string;
+  description?: string;
 }
 
 export interface Reel extends BaseContent {

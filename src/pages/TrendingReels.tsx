@@ -15,7 +15,7 @@ export function TrendingReels({ reels }: { reels: any[] }) {
 
   return (
     <section className="py-12">
-      <div className="mx-auto px-4">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
         {/* ...header... */}
 
         <div className="relative">
@@ -27,15 +27,8 @@ export function TrendingReels({ reels }: { reels: any[] }) {
           </button>
 
           <div
-            ref={scrollRef}
-            className="
-              flex 
-              overflow-x-auto 
-              scroll-smooth 
-              hide-scrollbar 
-              snap-x snap-mandatory 
-              gap-6
-              "
+             ref={scrollRef}
+            className="flex overflow-x-auto scroll-pl-4 snap-x snap-mandatory gap-4 hide-scrollbar pb-2"
           >
             {reels.map(r => (
               <div
