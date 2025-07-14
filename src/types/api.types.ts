@@ -133,6 +133,20 @@ export interface Video {
   };
   duration: string;
   user: unknown;
+  mediaDetails?: {
+    url: string;
+  }
+  thumbnailDetails?: {
+    url: string;
+  };
+  categoryId?: {
+    _id: string;
+    name: string;
+  };
+  stats?: {
+    views: number;
+  };
+  id?: string;
 }
 
 export interface Reel extends BaseContent {

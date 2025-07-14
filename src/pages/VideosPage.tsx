@@ -62,6 +62,7 @@ const VideosPage = () => {
                 author={video.author || 'Unknown Author'}
                 views={video.views || 0}
                 duration={video.duration || '0:00'}
+                previewUrl={video.mediaDetails.url || ''}
               />
             ))}
           </div>

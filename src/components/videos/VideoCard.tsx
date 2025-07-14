@@ -1,28 +1,93 @@
-
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
-import { Play } from "lucide-react";
+import { useEffect, useRef, useState } from 'react';
+import { useVideoDuration } from '@/hooks/useVideoDuration';
 
-interface VideoCardProps {
+export interface VideoCardProps {
   id: string;
-  thumbnail: string;
+  thumbnail?: string;
   title: string;
   author: string;
   views: number;
   duration: string;
+  previewUrl: string;
 }
 
-const VideoCard = ({ id, thumbnail, title, author, views, duration }: VideoCardProps) => {
-  const formattedViews = views >= 1000000
-    ? `${(views / 1000000).toFixed(1)}M`
-    : views >= 1000
-      ? `${(views / 1000).toFixed(1)}K`
+const VideoCard = ({
+  id,
+  thumbnail,
+  title,
+  author,
+  views,
+  duration,
+  previewUrl
+}: VideoCardProps) => {
+  const formattedViews = views >= 1e6
+    ? `${(views / 1e6).toFixed(1)}M`
+    : views >= 1e3
+      ? `${(views / 1e3).toFixed(1)}K`
       : views;
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [stopTime, setStopTime] = useState<number>(0);
+
+  const currentDuration = useVideoDuration(previewUrl);
+
+  // Once metadata is loaded, compute mid-point preview start & stop
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    const onLoadedMeta = () => {
+      const mid = vid.duration / 2;
+      const end = Math.min(mid + 10, vid.duration);
+      setStopTime(end);
+      vid.removeEventListener('loadedmetadata', onLoadedMeta);
+    };
+    vid.addEventListener('loadedmetadata', onLoadedMeta);
+    return () => {
+      vid.removeEventListener('loadedmetadata', onLoadedMeta);
+    };
+  }, []);
+
+  // Stop playback at stopTime
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    const onTimeUpdate = () => {
+      if (vid.currentTime >= stopTime) {
+        vid.pause();
+      }
+    };
+    vid.addEventListener('timeupdate', onTimeUpdate);
+    return () => vid.removeEventListener('timeupdate', onTimeUpdate);
+  }, [stopTime]);
+
+  // Hover handlers to play that middle-10s clip
+  const handleMouseEnter = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.muted = true;
+    const start = stopTime ? stopTime - 10 : 0;  // play from (end‑10)
+    vid.currentTime = start;
+    vid.play().catch(() => {});
+  };
+  const handleMouseLeave = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.pause();
+    // reset to preview start (so mouse‑enter always works)
+    const start = stopTime ? stopTime - 10 : 0;
+    vid.currentTime = start;
+  };
 
   return (
     <Link to={`/videos/${id}`}>
       <Card className="overflow-hidden group hover:ring-2 hover:ring-reel-purple-500/50 transition-all duration-300">
-        <div className="aspect-video relative overflow-hidden bg-black">
+        <div
+          className="aspect-video relative overflow-hidden bg-black cursor-pointer"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           {thumbnail ? (
             <img
               src={thumbnail}
@@ -31,21 +96,18 @@ const VideoCard = ({ id, thumbnail, title, author, views, duration }: VideoCardP
               crossOrigin="anonymous"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-400 text-lg font-semibold">
-              No Preview
-            </div>
+            <video
+              ref={videoRef}
+              src={previewUrl}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              playsInline
+              preload="metadata"
+            />
           )}
-
-          {/* Play Button Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="w-14 h-14 rounded-full bg-reel-purple-500/90 flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300">
-              <Play className="h-6 w-6 text-white" fill="white" />
-            </div>
-          </div>
 
           {/* Duration Badge */}
           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-            {duration}
+            {currentDuration || duration}
           </div>
         </div>
 

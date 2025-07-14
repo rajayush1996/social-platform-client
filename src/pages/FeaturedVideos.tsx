@@ -1,6 +1,7 @@
 import VideoCard from "@/components/videos/VideoCard";
+import { Video } from "@/types/api.types";
 
-export function FeaturedVideos({ videos }: { videos: any[] }) {
+export function FeaturedVideos({ videos }: { videos: Video[] }) {
     if (!videos?.length) return null;
   
     return (
@@ -17,6 +18,7 @@ export function FeaturedVideos({ videos }: { videos: any[] }) {
                 author={video.categoryId?.name || 'Unknown'}
                 views={video.stats?.views || 0}
                 duration={video.videoSpecific?.duration || '0:00'}
+                previewUrl={video.mediaDetails.url || ''}
               />
             ))}
           </div>

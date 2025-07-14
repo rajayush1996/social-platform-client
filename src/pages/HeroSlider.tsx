@@ -1,48 +1,76 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const slides = [
-  {
-    title: "Hot Summer Vacation Getaway",
-    subtitle: "Watch this steamy encounter during a tropical vacation",
-    image: "https://images.pexels.com/photos/2566573/pexels-photo-2566573.jpeg",
-  },
-  {
-    title: "Office Romance Unleashed",
-    subtitle: "Watch a secret romance unfold after hours",
-    image: "https://images.pexels.com/photos/1181351/pexels-photo-1181351.jpeg",
-  },
-];
 
 export default function HeroSlider({ videos }: { videos: any[] }) {
   const [current, setCurrent] = useState(0);
   const total = videos.length;
   const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const timerRef = useRef<NodeJS.Timeout>();
 
-  const next = () => setCurrent((current + 1) % total);
-  const prev = () => setCurrent((current - 1 + total) % total);
+  const next = () => setCurrent((c) => (c + 1) % total);
+  const prev = () => setCurrent((c) => (c - 1 + total) % total);
+
+  // auto-advance every 5s
+  useEffect(() => {
+    timerRef.current = setInterval(next, 5000);
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  // pause on hover
+  const pause = () => clearInterval(timerRef.current);
+  const resume = () => {
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(next, 5000);
+  };
+
+  // whenever current slide changes, reset the videoRef
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    // wait until metadata is loaded, then jump to mid
+    const onLoaded = () => {
+      vid.currentTime = vid.duration / 2;
+      vid.removeEventListener("loadedmetadata", onLoaded);
+    };
+    vid.addEventListener("loadedmetadata", onLoaded);
+
+    // ensure it starts from that point
+    vid.play().catch(() => {});
+  }, [current, videos]);
+
+  const slide = videos[current];
 
   return (
     <section className="py-12 mx-4">
-      <div className="mx-auto relative rounded-2xl overflow-hidden shadow-lg h-[500px]">
-        {/* Background image */}
-        {videos[current]?.thumbnailDetails?.url ? (
+      <div
+        ref={containerRef}
+        onMouseEnter={pause}
+        onMouseLeave={resume}
+        className="mx-auto relative rounded-2xl overflow-hidden shadow-lg h-[500px]"
+      >
+        {/* Background: thumbnail or video */}
+        {slide?.thumbnailDetails?.url ? (
           <img
-            src={videos[current].thumbnailDetails.url}
-            alt={videos[current]?.title}
+            src={slide.thumbnailDetails.url}
+            alt={slide.title || "Slide thumbnail"}
             crossOrigin="anonymous"
             className="absolute inset-0 w-full h-full object-cover"
           />
-        ) : videos[current]?.videoUrl ? (
+        ) : slide?.mediaDetails?.url ? (
           <video
-            src={videos[current].videoUrl}
+            ref={videoRef}
+            src={slide.mediaDetails.url}
             className="absolute inset-0 w-full h-full object-cover"
             autoPlay
             loop
             muted
             playsInline
+            crossOrigin="anonymous"
           />
         ) : (
           <div className="absolute inset-0 bg-black flex items-center justify-center text-white text-xl">
@@ -50,32 +78,35 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
           </div>
         )}
 
-
         {/* Bottom gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
 
-        {/* Content aligned to bottom-left */}
+        {/* Content */}
         <div className="absolute bottom-0 left-0 w-full z-20 p-6 md:p-10 text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">{videos[current]?.title}</h2>
-          <p className="text-lg mb-4 text-white/90">{videos[current]?.subtitle || ''}</p>
-          <Button className="bg-pink-500 hover:bg-pink-600" onClick={() => {
-            navigate(`/videos/${videos[current]?.id}`);
-          }}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-2">
+            {slide?.title}
+          </h2>
+          {slide?.subtitle && (
+            <p className="text-lg mb-4 text-white/90">{slide.subtitle}</p>
+          )}
+          <Button
+            className="bg-pink-500 hover:bg-pink-600"
+            onClick={() => navigate(`/videos/${slide?.id}`)}
+          >
             <span className="flex items-center gap-2">▶️ Play Now</span>
           </Button>
         </div>
 
-        {/* Navigation Arrows */}
+        {/* Arrows */}
         <button
           onClick={prev}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-pink-600 text-white p-2 rounded-full"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-pink-600 text-white p-2 rounded-full transition"
         >
           <ChevronLeft />
         </button>
-
         <button
           onClick={next}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-pink-600 text-white p-2 rounded-full"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-pink-600 text-white p-2 rounded-full transition"
         >
           <ChevronRight />
         </button>
@@ -83,10 +114,13 @@ export default function HeroSlider({ videos }: { videos: any[] }) {
         {/* Pagination Dots */}
         <div className="absolute bottom-4 right-6 z-30 flex gap-2">
           {videos.map((_, idx) => (
-            <div
+            <button
               key={idx}
-              className={`w-3 h-3 rounded-full ${current === idx ? "bg-pink-500" : "bg-white/40"
-                }`}
+              onClick={() => setCurrent(idx)}
+              className={`w-3 h-3 rounded-full transition-colors ${
+                current === idx ? "bg-pink-500" : "bg-white/40"
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
             />
           ))}
         </div>
