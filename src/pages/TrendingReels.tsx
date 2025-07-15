@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import ReelCard from "@/components/reels/ReelCard";
+import { useNavigate } from "react-router-dom";
 
 export function TrendingReels({ reels }: { reels: any[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const scroll = (dir: "left" | "right") => {
     const offset = window.innerWidth; // scroll by full viewport
@@ -14,9 +17,17 @@ export function TrendingReels({ reels }: { reels: any[] }) {
   };
 
   return (
-    <section className="py-12">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ...header... */}
+    <section className="trending_reels mt-12">
+      <div className="container mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold">Trending Reels</h2>
+          <button
+            onClick={() => navigate("/reels")}
+            className="text-pink-500 hover:underline text-sm"
+          >
+            View All
+          </button>
+        </div>
 
         <div className="relative">
           <button
@@ -27,10 +38,10 @@ export function TrendingReels({ reels }: { reels: any[] }) {
           </button>
 
           <div
-             ref={scrollRef}
+            ref={scrollRef}
             className="flex overflow-x-auto scroll-pl-4 snap-x snap-mandatory gap-4 hide-scrollbar pb-2"
           >
-            {reels.map(r => (
+            {reels.map((r) => (
               <div
                 key={r.id}
                 className="

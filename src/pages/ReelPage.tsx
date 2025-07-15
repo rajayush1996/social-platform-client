@@ -1,7 +1,7 @@
 // src/pages/ReelPage.tsx
 import React, { useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useReelById } from '@/hooks/useReel'; // custom hook to fetch single reel
+import { useReel } from '@/hooks/useReel'; // custom hook to fetch single reel
 import { useVideoDuration } from '@/hooks/useVideoDuration';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -9,7 +9,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 export default function ReelPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: reel, isLoading, isError } = useReelById(id!);
+  const { data: reel, isLoading, isError } = useReel(id!);
   const videoRef = useRef<HTMLVideoElement>(null);
   const duration = useVideoDuration(reel?.mediaFileUrl || '');
   const [muted, setMuted] = React.useState(true);
@@ -55,7 +55,7 @@ export default function ReelPage() {
 
       {/* Additional metadata */}
       <div className="text-sm text-gray-600 space-x-4">
-        <span>Category: {reel.category.name}</span>
+        <span>Category: {reel.category}</span>
         <span>Views: {reel.views}</span>
         <span>Likes: {reel.likeCount}</span>
       </div>

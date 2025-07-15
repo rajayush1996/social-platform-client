@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useVideo } from "@/hooks/useVideo";
 import Layout from "@/components/Layout";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 
 const VideoDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,9 +29,33 @@ const VideoDetail = () => {
   const [duration, setDuration] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
 
+
+   const skip = useCallback((sec: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    let t = v.currentTime + sec;
+    if (t < 0) t = 0;
+    if (t > duration) t = duration;
+    v.currentTime = t;
+    setCurrentTime(t);
+  }, [duration]);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().catch(console.error);
+      setPlaying(true);
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
+  };
+
   // video event listeners
   useEffect(() => {
     const v = videoRef.current;
+    console.log("🚀 ~ :36 ~ useEffect ~ v:", v?.duration)
     if (!v) return;
     const onTime = () => setCurrentTime(v.currentTime);
     const onMeta = () => setDuration(v.duration);
@@ -41,12 +65,13 @@ const VideoDetail = () => {
       v.removeEventListener("timeupdate", onTime);
       v.removeEventListener("loadedmetadata", onMeta);
     };
-  }, []);
+  }, [video]);
 
   // keyboard controls
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (!containerRef.current?.contains(document.activeElement as Node)) return;
+      if (!containerRef.current?.contains(document.activeElement as Node))
+        return;
       switch (e.code) {
         case "Space":
           e.preventDefault();
@@ -62,30 +87,10 @@ const VideoDetail = () => {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [currentTime, duration]);
+  }, [currentTime, duration, skip]);
 
-  const togglePlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.paused) {
-      v.play().catch(console.error);
-      setPlaying(true);
-    } else {
-      v.pause();
-      setPlaying(false);
-    }
-  };
 
-  const skip = (sec: number) => {
-    const v = videoRef.current;
-    if (!v) return;
-    let t = v.currentTime + sec;
-    if (t < 0) t = 0;
-    if (t > duration) t = duration;
-    v.currentTime = t;
-    setCurrentTime(t);
-  };
-
+ 
   const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     setVolume(val);
@@ -183,8 +188,8 @@ const VideoDetail = () => {
               max={duration}
               step="0.1"
               value={currentTime}
-              onInput={handleProgress}
-              className="w-full accent-pink-500"
+              onChange={handleProgress}
+              className="w-full accent-pink-500 cursor-pointer"
             />
 
             <div className="flex items-center justify-between text-white">
@@ -193,14 +198,22 @@ const VideoDetail = () => {
                   <SkipBack className="w-5 h-5" />
                 </button>
                 <button onClick={togglePlay} title="Play / Pause">
-                  {playing ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                  {playing ? (
+                    <Pause className="w-6 h-6" />
+                  ) : (
+                    <Play className="w-6 h-6" />
+                  )}
                 </button>
                 <button onClick={() => skip(10)} title="Forward 10s">
                   <SkipForward className="w-5 h-5" />
                 </button>
 
                 <button onClick={toggleMute} title="Mute / Unmute">
-                  {muted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  {muted || volume === 0 ? (
+                    <VolumeX className="w-5 h-5" />
+                  ) : (
+                    <Volume2 className="w-5 h-5" />
+                  )}
                 </button>
                 <input
                   type="range"
@@ -218,7 +231,11 @@ const VideoDetail = () => {
               </div>
 
               <button onClick={toggleFullscreen} title="Fullscreen">
-                {fullscreen ? <Minimize2 className="w-6 h-6" /> : <Maximize2 className="w-6 h-6" />}
+                {fullscreen ? (
+                  <Minimize2 className="w-6 h-6" />
+                ) : (
+                  <Maximize2 className="w-6 h-6" />
+                )}
               </button>
             </div>
           </div>
@@ -227,9 +244,12 @@ const VideoDetail = () => {
         <div className="max-w-4xl mx-auto mt-6 text-white space-y-2">
           <h1 className="text-3xl font-bold">{video.title}</h1>
           <p className="text-sm text-gray-400">
-            By {video.user.username} • {video.views} views • {formatTime(duration)}
+            By {video.user.username} • {video.views} views •{" "}
+            {formatTime(duration)}
           </p>
-          {video.description && <p className="mt-4 text-gray-200">{video.description}</p>}
+          {video.description && (
+            <p className="mt-4 text-gray-200">{video.description}</p>
+          )}
         </div>
       </div>
     </Layout>

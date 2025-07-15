@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '@/lib/axios';
 import { API_CONFIG } from '@/config/api.config';
@@ -13,6 +14,7 @@ interface VideoListParams {
 }
 
 interface VideoListResponse {
+  totalPages: number;
   results: any[];
   videos: Video[];
   pagination: {

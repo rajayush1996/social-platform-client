@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import axiosInstance from '@/lib/axios';
 import { API_CONFIG } from '@/config/api.config';
@@ -44,6 +45,8 @@ export const useReels = (params: ReelListParams = {}) => {
 
 
 interface Reel {
+  likeCount: number;
+  mediaDetails: any;
   id: string;
   thumbnailId: string;
   mediaFileId: string;
