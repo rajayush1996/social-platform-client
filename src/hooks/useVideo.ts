@@ -13,12 +13,15 @@ interface VideoListParams {
 }
 
 interface VideoListResponse {
+  results: any[];
   videos: Video[];
   pagination: {
     page: number;
     limit: number;
-    total: number;
-    pages: number;
+    totalPages: number;
+    hasMore: boolean;
+    skip: number;
+    totalResults: number;
   };
 }
 

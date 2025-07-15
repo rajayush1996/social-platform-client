@@ -30,7 +30,7 @@ const VideosPage = () => {
     );
   }
 
-  const videos = data?.videos || [];
+  const videos = data?.results || [];
   const pagination = data?.pagination;
 
   if (videos.length === 0) {
@@ -44,7 +44,7 @@ const VideosPage = () => {
   }
 
   const handlePrev = () => setPage((p) => Math.max(1, p - 1));
-  const handleNext = () => setPage((p) => Math.min(pagination.pages, p + 1));
+  const handleNext = () => setPage((p) => Math.min(pagination.totalPages, p + 1));
 
   return (
     <Layout>
@@ -83,7 +83,7 @@ const VideosPage = () => {
             <Button onClick={handlePrev} disabled={page === 1} variant="outline">
               Previous
             </Button>
-            {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((num) => (
+            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((num) => (
               <button
                 key={num}
                 onClick={() => setPage(num)}
@@ -94,7 +94,7 @@ const VideosPage = () => {
                 {num}
               </button>
             ))}
-            <Button onClick={handleNext} disabled={page === pagination.pages} variant="outline">
+            <Button onClick={handleNext} disabled={page === pagination.totalPages} variant="outline">
               Next
             </Button>
           </div>
