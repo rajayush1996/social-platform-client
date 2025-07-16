@@ -29,60 +29,67 @@ const VideoCard = ({
       : views;
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [stopTime, setStopTime] = useState<number>(0);
 
-  const currentDuration = useVideoDuration(previewUrl);
+  // Compute actual duration once metadata is loaded
+  const trueDuration = useVideoDuration(previewUrl);
 
-  // Once metadata is loaded, compute mid-point preview start & stop
+  // We'll store the start/end times for our 5s clip
+  const [clipStart, setClipStart] = useState(0);
+  const [clipEnd, setClipEnd] = useState(0);
+
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    const onLoadedMeta = () => {
+
+    const handleLoaded = () => {
       const mid = vid.duration / 2;
-      const end = Math.min(mid + 5, vid.duration);
-      setStopTime(end);
-      vid.removeEventListener('loadedmetadata', onLoadedMeta);
+      // Center a 5s window around the midpoint:
+      const halfWindow = 2.5;
+      const start = Math.max(mid - halfWindow, 0);
+      const end = Math.min(mid + halfWindow, vid.duration);
+      setClipStart(start);
+      setClipEnd(end);
+      vid.removeEventListener('loadedmetadata', handleLoaded);
     };
-    vid.addEventListener('loadedmetadata', onLoadedMeta);
-    return () => {
-      vid.removeEventListener('loadedmetadata', onLoadedMeta);
-    };
-  }, []);
 
-  // Stop playback at stopTime
+    vid.addEventListener('loadedmetadata', handleLoaded);
+    return () => vid.removeEventListener('loadedmetadata', handleLoaded);
+  }, [previewUrl]);
+
+  // Stop playback once we hit clipEnd
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    const onTimeUpdate = () => {
-      if (vid.currentTime >= stopTime) {
+
+    const handleTimeUpdate = () => {
+      if (vid.currentTime >= clipEnd) {
         vid.pause();
       }
     };
-    vid.addEventListener('timeupdate', onTimeUpdate);
-    return () => vid.removeEventListener('timeupdate', onTimeUpdate);
-  }, [stopTime]);
 
-  // Hover handlers to play that middle-10s clip
+    vid.addEventListener('timeupdate', handleTimeUpdate);
+    return () => vid.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [clipEnd]);
+
   const handleMouseEnter = () => {
     const vid = videoRef.current;
     if (!vid) return;
     vid.muted = true;
-    const start = stopTime ? stopTime - 10 : 0;  // play from (end‑10)
-    vid.currentTime = start;
+    vid.currentTime = clipStart;
     vid.play().catch(() => {});
   };
+
   const handleMouseLeave = () => {
     const vid = videoRef.current;
     if (!vid) return;
     vid.pause();
-    // reset to preview start (so mouse‑enter always works)
-    const start = stopTime ? stopTime - 10 : 0;
-    vid.currentTime = start;
+    // rewind to start of clip so future hovers restart cleanly
+    vid.currentTime = clipStart;
   };
 
   return (
     <Link to={`/videos/${id}`}>
-      <Card className="overflow-hidden group hover:ring-2 hover:ring-reel-purple-500/50 transition-all duration-300">
+      <Card className="overflow-hidden group hover:ring-2 hover:ring-pink-500 transition-all duration-300">
         <div
           className="aspect-video relative overflow-hidden bg-black cursor-pointer"
           onMouseEnter={handleMouseEnter}
@@ -101,19 +108,19 @@ const VideoCard = ({
               src={previewUrl}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               playsInline
-              preload="metadata"
+              preload="auto"
             />
           )}
 
           {/* Duration Badge */}
           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-            {currentDuration || duration}
+            {trueDuration || duration}
           </div>
         </div>
 
         <div className="p-4">
-          <h3 className="font-medium text-foreground line-clamp-2 mb-2">{title}</h3>
-          <div className="flex justify-between items-center text-sm text-foreground/70">
+          <h3 className="font-medium text-white line-clamp-2 mb-2">{title}</h3>
+          <div className="flex justify-between items-center text-sm text-white/70">
             <p>{author}</p>
             <p>{formattedViews} views</p>
           </div>

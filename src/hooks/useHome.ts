@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // hooks/useHomeContent.ts
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import axiosInstance from '@/lib/axios';
 import { API_CONFIG } from '@/config/api.config';
 import type { Video, Reel, Blog } from '@/types/api.types';
@@ -46,5 +46,32 @@ export function useHomeContentInfinite(
       lastPage.latestVideos.hasMore
         ? lastPage.latestVideos.page + 1
         : undefined,
+  });
+}
+
+
+interface TrendingVideosParams {
+  page?: number;
+  limit?: number;
+}
+
+interface TrendingVideosResponse {
+  currentPage: number;
+  results: Video[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export function useTrendingVideos({ page = 1, limit = 10 }: TrendingVideosParams) {
+  return useQuery<TrendingVideosResponse>({
+    queryKey: ["trendingVideos", page, limit],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `${API_CONFIG.ENDPOINTS.USER.TRENDING_VIDEOS}?page=${page}&limit=${limit}`
+      );
+      return response.data.data as TrendingVideosResponse;
+    },
+    placeholderData: (previousData) => previousData,
   });
 }

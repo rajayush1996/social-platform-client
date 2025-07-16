@@ -8,6 +8,7 @@ import { useReels } from '@/hooks/useReel';
 import Layout from '@/components/Layout';
 import { Reel } from '@/types/api.types';
 import { Link } from 'react-router-dom';
+import { BounceLoader } from 'react-spinners';
 
 // Use an online placeholder avatar
 const avatar = "https://ui-avatars.com/api/?name=User&background=6c47ff&color=fff";
@@ -254,8 +255,15 @@ function ReelsPage() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          Loading reels…
+        {/* full‐screen backdrop */}
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <BounceLoader
+            color="#ec4899"
+            loading={true}
+            size={250}
+            aria-label="Loading content"
+            data-testid="bounce-loader"
+          />
         </div>
       </Layout>
     );

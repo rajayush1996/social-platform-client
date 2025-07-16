@@ -27,22 +27,35 @@ export default function ReelCard({ reel }) {
 
   const handleMouseEnter = () => {
     setHovered(true);
-    if (!thumbnailDetails?.url && videoRef.current) {
-      videoRef.current.muted = muted;
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {});
+    const vid = videoRef.current;
+    if (!thumbnailDetails?.url && vid) {
+      vid.muted = muted;
+      vid.currentTime = 0;
+      vid.play().catch(() => {});
+
+      // stop at 5s for a quick hover preview
+      const onTimeUpdate = () => {
+        if (vid.currentTime >= 5) {
+          vid.pause();
+          vid.removeEventListener('timeupdate', onTimeUpdate);
+        }
+      };
+      vid.addEventListener('timeupdate', onTimeUpdate);
     }
   };
 
   const handleMouseLeave = () => {
     setHovered(false);
-    if (!thumbnailDetails?.url && videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
+    const vid = videoRef.current;
+    if (!thumbnailDetails?.url && vid) {
+      vid.pause();
+      vid.currentTime = 0;
+      // remove any leftover listener
+      vid.removeEventListener('timeupdate', () => {});
     }
   };
 
-  const toggleMute = (e) => {
+  const toggleMute = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setMuted((prev) => {
@@ -67,7 +80,7 @@ export default function ReelCard({ reel }) {
               muted={muted}
               loop
               playsInline
-              preload="metadata"
+              preload="auto"
               className="w-full h-full object-cover"
             />
           ) : (

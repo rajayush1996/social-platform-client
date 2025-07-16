@@ -3,18 +3,26 @@ import VideoCard from "@/components/videos/VideoCard";
 import { useVideos } from "@/hooks/useVideo";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
+import { BounceLoader } from "react-spinners";
 
 const VideosPage = () => {
   const [page, setPage] = useState(1);
-  const limit = 8;
+  const limit = 16;
   // Pass page and limit to fetch paginated videos
   const { data, isLoading, isError } = useVideos({ page, limit });
 
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">Loading videos...</span>
+        {/* full‐screen backdrop */}
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <BounceLoader
+            color="#ec4899"
+            loading={true}
+            size={250}
+            aria-label="Loading content"
+            data-testid="bounce-loader"
+          />
         </div>
       </Layout>
     );
