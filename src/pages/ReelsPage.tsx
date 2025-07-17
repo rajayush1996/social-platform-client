@@ -1,29 +1,67 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Share2, Play, Pause, Loader2, Maximize } from 'lucide-react';
-import ReelsNavigation from '@/components/ReelsNavigation';
-import { useReels } from '@/hooks/useReel';
-import Layout from '@/components/Layout';
-import { Reel } from '@/types/api.types';
-import { Link } from 'react-router-dom';
-import { BounceLoader } from 'react-spinners';
+import { useEffect, useRef, useState, useCallback } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Play,
+  Pause,
+  Loader2,
+  Maximize,
+  VolumeX,
+  Volume2,
+} from "lucide-react";
+import ReelsNavigation from "@/components/ReelsNavigation";
+import { useReelsInfinite } from "@/hooks/useReel";
+import Layout from "@/components/Layout";
+import { Reel } from "@/types/api.types";
+import { Link } from "react-router-dom";
+import { BounceLoader } from "react-spinners";
 
 // Use an online placeholder avatar
-const avatar = "https://ui-avatars.com/api/?name=User&background=6c47ff&color=fff";
-const fallbackImage = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80";
+const avatar =
+  "https://ui-avatars.com/api/?name=User&background=6c47ff&color=fff";
+const fallbackImage =
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80";
 
 const ReelCard = ({ reel }: { reel: Reel }) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(reel.stats?.likes || 0);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
-  const [commentInput, setCommentInput] = useState('');
+  const [commentInput, setCommentInput] = useState("");
   const [playing, setPlaying] = useState(true);
   const [videoError, setVideoError] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [muted, setMuted] = useState(true);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    const vid = videoRef.current;
+    if (!node || !vid) return;
+
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          vid.play().catch(() => {});
+          setPlaying(true);
+        } else {
+          vid.pause();
+          setPlaying(false);
+        }
+      },
+      { threshold: 0.6 } // when 60% of card is visible
+    );
+
+    obs.observe(node);
+    return () => {
+      obs.disconnect();
+    };
+  }, []);
 
   // Like animation
   const handleLike = () => {
@@ -50,19 +88,34 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
       ...comments,
       {
         id: comments.length + 1,
-        user: 'You',
+        user: "You",
         avatar,
         text: commentInput,
-        time: 'now',
+        time: "now",
       },
     ]);
-    setCommentInput('');
+    setCommentInput("");
+  };
+
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+
+    // flip the muted flag
+    v.muted = !v.muted;
+    setMuted(v.muted);
+
+    // if we’re unmuting, make sure it’s playing (and at full volume)
+    if (!v.muted) {
+      v.volume = 1;
+      v.play().catch(() => {});
+    }
   };
 
   return (
     <Card
       className="rounded-[2rem] shadow-xl p-0 overflow-hidden border border-border bg-gradient-to-br from-[#1c1c2c]/80 to-[#28243D]/80 backdrop-blur-xl group relative"
-      style={{ perspective: '1200px' }}
+      style={{ perspective: "1200px" }}
     >
       {/* Glass overlay */}
       <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-black/80 via-reel-purple-900/30 to-transparent" />
@@ -71,6 +124,18 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
       <div className="relative z-20">
         {/* Larger Video area */}
         <div className="relative w-full h-[36rem] bg-black flex items-center justify-center">
+          <button
+            onClick={toggleMute}
+            className="absolute top-4 left-4 z-30 bg-black/60 hover:bg-black/80 rounded-full p-2 transition"
+            title={muted ? "Unmute" : "Mute"}
+            type="button"
+          >
+            {muted ? (
+              <VolumeX className="h-5 w-5 text-white" />
+            ) : (
+              <Volume2 className="h-5 w-5 text-white" />
+            )}
+          </button>
           <button
             className="absolute top-4 right-4 z-30 bg-black/60 hover:bg-black/80 rounded-full p-2 transition"
             title="Fullscreen"
@@ -90,10 +155,19 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
             <Maximize className="h-5 w-5 text-white" />
           </button>
           {videoError ? (
-            <div className="flex flex-col items-center justify-center w-full h-full">
-              <img src={fallbackImage} alt="Video unavailable" className="w-full h-full object-cover rounded-t-[2rem]" />
+            <div
+              ref={containerRef}
+              className="flex flex-col items-center justify-center w-full h-full"
+            >
+              <img
+                src={fallbackImage}
+                alt="Video unavailable"
+                className="w-full h-full object-cover rounded-t-[2rem]"
+              />
               <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-                <span className="text-white text-lg font-semibold">Video unavailable</span>
+                <span className="text-white text-lg font-semibold">
+                  Video unavailable
+                </span>
               </div>
             </div>
           ) : (
@@ -105,7 +179,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
               )}
               <video
                 ref={videoRef}
-                src={reel.mediaFileUrl || ''}
+                src={reel.mediaFileUrl || ""}
                 className="w-full h-full object-cover rounded-t-[2rem]"
                 autoPlay
                 loop
@@ -141,11 +215,17 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
           />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-white/90 text-sm">{reel?.categoryId?.name}</span>
-              <span className="text-xs text-gray-400">• {new Date(reel?.createdAt).toLocaleDateString()}</span>
+              <span className="font-semibold text-white/90 text-sm">
+                {reel?.categoryId?.name}
+              </span>
+              <span className="text-xs text-gray-400">
+                • {new Date(reel?.createdAt).toLocaleDateString()}
+              </span>
             </div>
             <div className="text-sm text-gray-300 mt-0.5">{reel?.title}</div>
-            <div className="text-sm text-gray-400 mt-0.5">{reel?.description}</div>
+            <div className="text-sm text-gray-400 mt-0.5">
+              {reel?.description}
+            </div>
           </div>
           {/* Right action buttons */}
           <div className="flex flex-col items-center gap-4">
@@ -154,8 +234,9 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
               className="flex flex-col items-center gap-1"
             >
               <Heart
-                className={`h-7 w-7 transition-all duration-200 ${liked ? 'fill-red-500 text-red-500 scale-110' : 'text-white'
-                  }`}
+                className={`h-7 w-7 transition-all duration-200 ${
+                  liked ? "fill-red-500 text-red-500 scale-110" : "text-white"
+                }`}
               />
               <span className="text-xs text-white/80">{likeCount}</span>
             </button>
@@ -200,7 +281,9 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
                       <span className="font-medium text-white/90 text-sm">
                         {comment?.user}
                       </span>
-                      <span className="text-xs text-gray-400">{comment?.time}</span>
+                      <span className="text-xs text-gray-400">
+                        {comment?.time}
+                      </span>
                     </div>
                     <p className="text-sm text-gray-300">{comment?.text}</p>
                   </div>
@@ -214,9 +297,9 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
   );
 };
 
-
-function ReelsPage() {
+export default function ReelsPage() {
   const loaderRef = useRef<HTMLDivElement>(null);
+
   const {
     data,
     isLoading,
@@ -224,45 +307,41 @@ function ReelsPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useReels();
+  } = useReelsInfinite(10); // <-- pass page size here
 
-  const reels = data?.pages.flatMap(p => p.results) ?? [];
+  // flatten all pages.results into one array
+  const reels: Reel[] = data?.pages.flatMap((page) => page.results) ?? [];
 
-  // Set up observer *once* on mount
+  // infinite‐scroll observer
   useEffect(() => {
-    const node = loaderRef.current;
-    if (!node) return;
+    const sentinel = loaderRef.current;
+    if (!sentinel) return;
 
-    const observer = new IntersectionObserver(
+    const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       },
-      {
-        // start loading when loader is within 200px of viewport
-        rootMargin: '200px',
-        threshold: 0, 
-      }
+      { rootMargin: "200px", threshold: 0 }
     );
 
-    observer.observe(node);
+    obs.observe(sentinel);
     return () => {
-      observer.unobserve(node);
+      obs.unobserve(sentinel);
+      obs.disconnect();
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (isLoading) {
     return (
       <Layout>
-        {/* full‐screen backdrop */}
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <BounceLoader
+            loading
             color="#ec4899"
-            loading={true}
-            size={250}
-            aria-label="Loading content"
-            data-testid="bounce-loader"
+            size={150}
+            aria-label="Loading reels..."
           />
         </div>
       </Layout>
@@ -298,16 +377,16 @@ function ReelsPage() {
             <ReelCard key={reel.id} reel={reel} />
           ))}
 
-          {/* This is the “sentinel” our observer watches */}
+          {/* sentinel for IntersectionObserver */}
           <div
             ref={loaderRef}
             className="flex justify-center py-8 border-dashed border-2 border-reel-purple-500"
           >
-            {isFetchingNextPage
-              ? <span>Loading more…</span>
-              : !hasNextPage
-                ? <span>You’re all caught up!</span>
-                : null}
+            {isFetchingNextPage ? (
+              <span>Loading more…</span>
+            ) : !hasNextPage ? (
+              <span>You’re all caught up!</span>
+            ) : null}
           </div>
         </div>
       </div>
@@ -315,5 +394,4 @@ function ReelsPage() {
   );
 }
 
-
-export default ReelsPage;
+// export default ReelsPage;
