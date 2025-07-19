@@ -48,7 +48,7 @@ export function FeaturedVideos({
               author={video.categoryId?.name || "Unknown"}
               views={video.stats?.views || 0}
               duration={video.videoSpecific?.duration || "0:00"}
-              previewUrl={video.mediaDetails.url || ""}
+              previewUrl={video?.mediaDetails?.url || ""}
             />
           ))}
 
