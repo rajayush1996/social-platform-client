@@ -1,15 +1,28 @@
+import { useState } from "react";
 import VideoCard from "@/components/videos/VideoCard";
 import { useVideos } from "@/hooks/useVideo";
 import Layout from "@/components/Layout";
+import { Button } from "@/components/ui/button";
+import { BounceLoader } from "react-spinners";
 
 const VideosPage = () => {
-  const { data, isLoading, isError } = useVideos();
+  const [page, setPage] = useState(1);
+  const limit = 16;
+  // Pass page and limit to fetch paginated videos
+  const { data, isLoading, isError } = useVideos({ page, limit });
 
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">Loading videos...</span>
+        {/* full‐screen backdrop */}
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <BounceLoader
+            color="#ec4899"
+            loading={true}
+            size={250}
+            aria-label="Loading content"
+            data-testid="bounce-loader"
+          />
         </div>
       </Layout>
     );
@@ -25,7 +38,10 @@ const VideosPage = () => {
     );
   }
 
-  if (!data || !data.videos || data.videos.length === 0) {
+  const videos = data?.results || [];
+  const pagination = data?.pagination;
+
+  if (videos.length === 0) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
@@ -34,6 +50,9 @@ const VideosPage = () => {
       </Layout>
     );
   }
+
+  const handlePrev = () => setPage((p) => Math.max(1, p - 1));
+  const handleNext = () => setPage((p) => Math.min(pagination.totalPages, p + 1));
 
   return (
     <Layout>
@@ -53,17 +72,39 @@ const VideosPage = () => {
       <section className="py-12">
         <div className="container px-4 mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {data.videos.map(video => (
-              <VideoCard 
+            {videos.map((video) => (
+              <VideoCard
                 key={video._id}
                 id={video._id}
-                thumbnail={video.thumbnail?.url || 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81'}
+                thumbnail={video.thumbnail?.url}
                 title={video.title || 'Untitled Video'}
-                author={video.author || 'Unknown Author'}
+                author={video.user?.username || 'Unknown Author'}
                 views={video.views || 0}
-                duration={video.duration || '0:00'}
+                duration={video.videoSpecific?.duration || '0:00'}
+                previewUrl={video.mediaFile.url}
               />
             ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="flex justify-center items-center mt-10 space-x-2">
+            <Button onClick={handlePrev} disabled={page === 1} variant="outline">
+              Previous
+            </Button>
+            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((num) => (
+              <button
+                key={num}
+                onClick={() => setPage(num)}
+                className={`px-3 py-1 rounded ${
+                  page === num ? 'bg-pink-500 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                {num}
+              </button>
+            ))}
+            <Button onClick={handleNext} disabled={page === pagination.totalPages} variant="outline">
+              Next
+            </Button>
           </div>
         </div>
       </section>

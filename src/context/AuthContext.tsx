@@ -34,16 +34,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
     
-    // If profile fetch failed, user is not authenticated
-    if (isError) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-      localStorage.removeItem('profile');
-      setIsAuthenticated(false);
-      setProfile(null);
+    // Handle profile loading state
+    if (isProfileLoading) {
+      setIsLoading(true);
+    } else {
       setIsLoading(false);
     }
-  }, [token, profileData, isError]);
+  }, [token, profileData, isError, isProfileLoading]);
 
   const login = () => {
     setIsAuthenticated(true);

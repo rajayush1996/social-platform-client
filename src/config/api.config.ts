@@ -24,6 +24,8 @@ export const API_CONFIG = {
       PUBLIC_PROFILE: (id: string) => `/users/${id}`,
       // Content
       HOME: '/user/home',
+      CATEGORIES: '/user/categories',
+      TRENDING_VIDEOS: '/user/home/trending',
       BLOGS: '/user/blogs',
       BLOGS_DETAIL: (id: string) => `/user/blogs/${id}`,
       BLOGS_COMMENTS: (id: string) => `/user/blogs/${id}/comments`,

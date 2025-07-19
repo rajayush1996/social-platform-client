@@ -1,138 +1,165 @@
-import { Link } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Film, BookOpen } from "lucide-react";
-import ReelCard from "@/components/reels/ReelCard";
-import FeaturedReel from "@/components/reels/FeaturedReel";
-import BlogCard from "@/components/blog/BlogCard";
-import FeaturedBlog from "@/components/blog/FeaturedBlog";
-import VideoCard from "@/components/videos/VideoCard";
-import { useHomeContent } from "@/hooks/useHome";
+// pages/Index.tsx
+import { useState } from "react";
 import Layout from "@/components/Layout";
+import { useHomeContentInfinite, useTrendingVideos } from "@/hooks/useHome";
+import CategoryNav from "@/components/CategoryNav";
+import HeroSlider from "./HeroSlider";
+import { TrendingReels } from "./TrendingReels";
+import { FeaturedVideos } from "./FeaturedVideos";
+import { FeaturedBlogs } from "./FeaturedBlogs";
+import { NoContentFallback } from "./NoContentFallback";
+import { TrendingVideos } from "./TrendingVideos";
+import EarnBanner from "@/components/EarnBanner";
+import { useCategories } from "@/hooks/useCategories";
+import { useNavigate } from "react-router-dom";
+import { BounceLoader } from "react-spinners";
 
-const Index = () => {
-  const { data, isLoading, isError } = useHomeContent();
+export default function Index() {
+  const [category, setCategory] = useState("all");
+  const latestLimit = 12;
+ 
+  // classic pagination for trendingVideos
+  const [trPage, setTrPage] = useState(1);
+  const [trLimit, setTrLimit] = useState(12);
 
+  // infinite for “latestVideos”
+  const {
+    data: homePages,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useHomeContentInfinite(
+    { categoryId: category === "all" ? undefined : category },
+    latestLimit
+  );
+  // const isLoading = true;
+
+  const {
+    data: trData,
+    isLoading: trLoading,
+    isError: trError,
+  } = useTrendingVideos({ page: trPage, limit: trLimit });
+
+  
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">Loading content...</span>
+        {/* full‐screen backdrop */}
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <BounceLoader
+            color="#ec4899"
+            loading={true}
+            size={250}
+            aria-label="Loading content"
+            data-testid="bounce-loader"
+          />
         </div>
       </Layout>
     );
   }
-
-  if (isError || !data) {
+  if (isError || !homePages) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">Failed to load content. Please try again later.</span>
+          <span className="text-lg text-muted-foreground">
+            Failed to load content.
+          </span>
         </div>
       </Layout>
     );
   }
 
-  const featuredBlogs = data.featured.blogs || [];
-  const latestBlogs = data.latest.blogs || [];
-  const featuredVideos = data.featured.videos || [];
+  // flatten
+  const allLatest = homePages.pages.flatMap((p) => p.latestVideos.results);
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="hero-gradient py-12 md:py-16">
-        <div className="container px-4 mx-auto">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">Welcome to Reel Blog Vibes</h1>
-            <p className="text-lg text-foreground/90">
-              Discover amazing videos, reels, and blog posts from creators around the world
-            </p>
+      <CategoryNav
+        activeCategory={category}
+        onCategoryChange={setCategory}
+      />
+
+      {/* <section className="container mx-auto mt-6">
+        <HeroSlider videos={allLatest} />
+      </section> */}
+
+      <section className="md:mx-12">
+        <TrendingReels reels={homePages.pages[0].trendingReels.results} />
+
+        <FeaturedVideos
+          videos={allLatest}
+          onLoadMore={fetchNextPage}
+          hasMore={Boolean(hasNextPage)}
+          isLoadingMore={isFetchingNextPage}
+        />
+
+        <FeaturedBlogs blogs={homePages.pages[0].trendingBlogs.results} />
+
+        <section className="container flex items-center gap-4 mb-4">
+          <label
+            htmlFor="trending-limit"
+            className="text-sm font-medium text-white"
+          >
+            Per‑page:
+          </label>
+
+          <div className="relative inline-block">
+            <select
+              id="trending-limit"
+              value={trLimit}
+              onChange={(e) => setTrLimit(+e.target.value)}
+              className="
+                  block
+                  w-20
+                  bg-gray-800
+                  text-white
+                  border border-gray-700
+                  rounded-md
+                  px-2 py-1
+                  focus:outline-none focus:ring-2 focus:ring-pink-500
+                  appearance-none
+                "
+            >
+              {[6, 12, 24, 48].map((n) => (
+                <option key={n} value={n} className="bg-gray-800 text-white">
+                  {n}
+                </option>
+              ))}
+            </select>
+            {/* little custom arrow so you don’t get the native one */}
+            <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-400">
+              ▾
+            </span>
           </div>
-        </div>
+        </section>
+
+        {trLoading ? (
+          <div className="flex justify-center space-x-2 py-8">
+            <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce" />
+            <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce delay-150" />
+            <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce delay-300" />
+          </div>
+        ) : trError || !trData ? (
+          <p className="text-center text-red-500">
+            Failed to load trending videos.
+          </p>
+        ) : (
+          <TrendingVideos
+            videos={trData.results}
+            page={trData.currentPage}
+            totalPages={trData.totalPages}
+            onPageChange={setTrPage}
+          />
+        )}
+
+        {!allLatest.length &&
+          homePages.pages[0].trendingBlogs.results.length === 0 &&
+          homePages.pages[0].trendingReels.results.length === 0 && (
+            <NoContentFallback />
+          )}
       </section>
-
-      {/* Featured Videos */}
-      {featuredVideos.length > 0 && (
-        <section className="py-12">
-          <div className="container px-4 mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Featured Videos</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {featuredVideos.map(video => (
-                <VideoCard
-                  key={video._id || video.id}
-                  id={video._id || video.id}
-                  thumbnail={video.videoSpecific?.thumbnailMetadata?.url || ''}
-                  title={video.title}
-                  author={video.categoryId?.name || 'Unknown'}
-                  views={video.stats?.views || 0}
-                  duration={video.videoSpecific?.duration || '0:00'}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Featured Blogs */}
-      {featuredBlogs.length > 0 && (
-        <section className="py-12 bg-background/50">
-          <div className="container px-4 mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Featured Blogs</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {featuredBlogs.map(blog => (
-                <FeaturedBlog
-                  key={blog._id || blog.id}
-                  id={blog._id || blog.id}
-                  thumbnail={blog.blogSpecific?.thumbnailMetadata?.url || ''}
-                  title={blog.title}
-                  excerpt={blog.description}
-                  author={blog.categoryId?.name || 'Unknown'}
-                  date={new Date(blog.createdAt).toLocaleDateString()}
-                  readTime={blog.blogSpecific?.readTime || '5 min'}
-                  category={blog.categoryId?.name || 'Uncategorized'}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Latest Blogs */}
-      {latestBlogs.length > 0 && (
-        <section className="py-12">
-          <div className="container px-4 mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Latest Blogs</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {latestBlogs.map(blog => (
-                <BlogCard
-                  key={blog._id || blog.id}
-                  id={blog._id || blog.id}
-                  thumbnail={blog.blogSpecific?.thumbnailMetadata?.url || ''}
-                  title={blog.title}
-                  excerpt={blog.description}
-                  author={blog.categoryId?.name || 'Unknown'}
-                  date={new Date(blog.createdAt).toLocaleDateString()}
-                  readTime={blog.blogSpecific?.readTime || '5 min'}
-                  category={blog.categoryId?.name || 'Uncategorized'}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* No Content Message */}
-      {!featuredVideos.length && !featuredBlogs.length && !latestBlogs.length && (
-        <section className="py-12">
-          <div className="container px-4 mx-auto">
-            <div className="text-center text-muted-foreground">
-              <p className="text-lg">No content available at the moment.</p>
-              <p className="text-sm mt-2">Check back later for new videos and blogs!</p>
-            </div>
-          </div>
-        </section>
-      )}
     </Layout>
   );
-};
-
-export default Index;
+}

@@ -10,7 +10,7 @@ import ReelsPage from "./pages/ReelsPage";
 import VideosPage from "./pages/VideosPage";
 import VideoDetail from "./pages/VideoDetail";
 import BlogPage from "./pages/BlogPage";
-import ReelDetail from "./pages/ReelDetail";
+// import ReelDetail from "./pages/ReelDetail";
 import BlogDetail from "./pages/BlogDetail";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
@@ -19,6 +19,7 @@ import SignUpPage from "./pages/SignUpPage";
 import VerificationIdentityPage from "./pages/VerificationIdentityPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ActivateAccountPage from "./pages/ActivateAccountPage";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <TooltipProvider>
+            <ErrorBoundary>
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginPage />} />
@@ -42,13 +44,14 @@ function App() {
               <Route path="/videos" element={<ProtectedRoute><VideosPage /></ProtectedRoute>} />
               <Route path="/videos/:id" element={<ProtectedRoute><VideoDetail /></ProtectedRoute>} />
               <Route path="/blog" element={<ProtectedRoute><BlogPage /></ProtectedRoute>} />
-              <Route path="/reels/:id" element={<ProtectedRoute><ReelDetail /></ProtectedRoute>} />
+              {/* <Route path="/reels/:id" element={<ProtectedRoute><ReelDetail /></ProtectedRoute>} /> */}
               <Route path="/blog/:id" element={<ProtectedRoute><BlogDetail /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
               {/* 404 Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </ErrorBoundary>
             <Toaster />
             <Sonner />
           </TooltipProvider>
