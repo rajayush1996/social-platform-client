@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { useEffect, useRef, useState } from 'react';
 import { useVideoDuration } from '@/hooks/useVideoDuration';
+import HlsVideo from '../HlsVideo';
 
 export interface VideoCardProps {
   id: string;
@@ -10,7 +11,7 @@ export interface VideoCardProps {
   author: string;
   views: number;
   duration: string;
-  previewUrl: string;
+  previewUrl: string;        // either .m3u8 or .mp4
 }
 
 const VideoCard = ({
@@ -28,47 +29,49 @@ const VideoCard = ({
       ? `${(views / 1e3).toFixed(1)}K`
       : views;
 
+  // <-- this ref now points at the actual <video> inside HlsVideo
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Compute actual duration once metadata is loaded
+  // compute duration via your custom hook
   const trueDuration = useVideoDuration(previewUrl);
+  console.log("trueDuration----->", title, trueDuration);
 
-  // We'll store the start/end times for our 5s clip
+  // these drive your 5‑second hover clip
   const [clipStart, setClipStart] = useState(0);
-  const [clipEnd, setClipEnd] = useState(0);
+  const [clipEnd,   setClipEnd]   = useState(0);
 
+  // once metadata is loaded (duration known), pick 5s around midpoint
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
 
-    const handleLoaded = () => {
+    const onMeta = () => {
       const mid = vid.duration / 2;
-      // Center a 5s window around the midpoint:
-      const halfWindow = 2.5;
-      const start = Math.max(mid - halfWindow, 0);
-      const end = Math.min(mid + halfWindow, vid.duration);
+      const halfWin = 2.5;
+      const start = Math.max(mid - halfWin, 0);
+      const end   = Math.min(mid + halfWin, vid.duration);
       setClipStart(start);
       setClipEnd(end);
-      vid.removeEventListener('loadedmetadata', handleLoaded);
+      vid.removeEventListener('loadedmetadata', onMeta);
     };
 
-    vid.addEventListener('loadedmetadata', handleLoaded);
-    return () => vid.removeEventListener('loadedmetadata', handleLoaded);
+    vid.addEventListener('loadedmetadata', onMeta);
+    return () => vid.removeEventListener('loadedmetadata', onMeta);
   }, [previewUrl]);
 
-  // Stop playback once we hit clipEnd
+  // pause once we hit the end of the clip
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
 
-    const handleTimeUpdate = () => {
+    const onTime = () => {
       if (vid.currentTime >= clipEnd) {
         vid.pause();
       }
     };
 
-    vid.addEventListener('timeupdate', handleTimeUpdate);
-    return () => vid.removeEventListener('timeupdate', handleTimeUpdate);
+    vid.addEventListener('timeupdate', onTime);
+    return () => vid.removeEventListener('timeupdate', onTime);
   }, [clipEnd]);
 
   const handleMouseEnter = () => {
@@ -78,12 +81,10 @@ const VideoCard = ({
     vid.currentTime = clipStart;
     vid.play().catch(() => {});
   };
-
   const handleMouseLeave = () => {
     const vid = videoRef.current;
     if (!vid) return;
     vid.pause();
-    // rewind to start of clip so future hovers restart cleanly
     vid.currentTime = clipStart;
   };
 
@@ -103,16 +104,18 @@ const VideoCard = ({
               crossOrigin="anonymous"
             />
           ) : (
-            <video
-              ref={videoRef}
+            <HlsVideo
+              ref={videoRef}                             // forwarded ref
               src={previewUrl}
+              preload="metadata"                         // ← ensure metadata loads
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              playsInline
-              preload="auto"
+              muted={true}
+              controls={false}
+              autoPlay={false}
             />
           )}
 
-          {/* Duration Badge */}
+          {/* Duration badge */}
           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
             {trueDuration || duration}
           </div>
