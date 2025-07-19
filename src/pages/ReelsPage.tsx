@@ -19,6 +19,7 @@ import Layout from "@/components/Layout";
 import { Reel } from "@/types/api.types";
 import { Link } from "react-router-dom";
 import { BounceLoader } from "react-spinners";
+import ReelVideoPlayer from "@/components/HlsReel";
 
 // Use an online placeholder avatar
 const avatar =
@@ -47,7 +48,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          vid.play().catch(() => {});
+          vid.play().catch(() => { });
           setPlaying(true);
         } else {
           vid.pause();
@@ -108,7 +109,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
     // if we’re unmuting, make sure it’s playing (and at full volume)
     if (!v.muted) {
       v.volume = 1;
-      v.play().catch(() => {});
+      v.play().catch(() => { });
     }
   };
 
@@ -177,18 +178,13 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
                   <Loader2 className="h-10 w-10 text-reel-purple-500 animate-spin" />
                 </div>
               )}
-              <video
+              <ReelVideoPlayer
                 ref={videoRef}
-                src={reel.mediaFileUrl || ""}
+                src={reel.mediaFileUrl || ''}
                 className="w-full h-full object-cover rounded-t-[2rem]"
-                autoPlay
-                loop
-                muted
-                playsInline
-                controls={false}
-                onClick={togglePlay}
                 onError={() => setVideoError(true)}
                 onLoadedData={() => setVideoLoading(false)}
+                onClick={togglePlay}
               />
               {/* Play/Pause overlay */}
               <button
@@ -234,9 +230,8 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
               className="flex flex-col items-center gap-1"
             >
               <Heart
-                className={`h-7 w-7 transition-all duration-200 ${
-                  liked ? "fill-red-500 text-red-500 scale-110" : "text-white"
-                }`}
+                className={`h-7 w-7 transition-all duration-200 ${liked ? "fill-red-500 text-red-500 scale-110" : "text-white"
+                  }`}
               />
               <span className="text-xs text-white/80">{likeCount}</span>
             </button>
