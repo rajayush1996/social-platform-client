@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { useEffect, useRef, useState } from 'react';
 import { useVideoDuration } from '@/hooks/useVideoDuration';
-import HlsVideo from '../HlsVideo';
+// import HlsVideo from '../HlsVideo';
+import HoverPreviewVideo from '../HlsVideo';
 
 export interface VideoCardProps {
   id: string;
@@ -104,14 +105,14 @@ const VideoCard = ({
               crossOrigin="anonymous"
             />
           ) : (
-            <HlsVideo
-              ref={videoRef}                             // forwarded ref
+            <HoverPreviewVideo
+              // ref={videoRef}                             // forwarded ref
               src={previewUrl}
-              preload="metadata"                         // ← ensure metadata loads
+              // preload="metadata"                         // ← ensure metadata loads
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              muted={true}
-              controls={false}
-              autoPlay={false}
+              // muted={true}
+              // controls={false}
+              // autoPlay={false}
             />
           )}
 

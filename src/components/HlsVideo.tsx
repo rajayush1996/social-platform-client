@@ -1,61 +1,121 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+// components/HoverPreviewVideo.tsx
+
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  HTMLAttributes,
+} from 'react';
 import Hls from 'hls.js';
 
-/**
- * A reusable video component that supports HLS (.m3u8) streams via Hls.js
- * and falls back to native playback for MP4 (or other) sources.
- * Accepts all standard <video> props and forwards ref to the underlying <video> element.
- */
-type HlsVideoProps = Omit<React.VideoHTMLAttributes<HTMLVideoElement>, 'ref'> & {
-  /**
-   * URL of the HLS manifest (.m3u8) or any video source (e.g. .mp4).
-   */
+type HoverPreviewVideoProps = {
+  /** URL to a .m3u8 or .mp4 */
   src: string;
-};
+  /** CSS classes to apply to the <video> */
+  className?: string;
+} & HTMLAttributes<HTMLDivElement>;
 
-const HlsVideo = forwardRef<HTMLVideoElement, HlsVideoProps>(({
-  src,
-  poster,
-  ...videoProps
-}, ref) => {
-  const internalRef = useRef<HTMLVideoElement>(null);
+const HoverPreviewVideo = forwardRef<HTMLVideoElement, HoverPreviewVideoProps>(
+  ({ src, className = '' }, ref) => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [clipStart, setClipStart] = useState(0);
+    const [clipEnd, setClipEnd] = useState(0);
 
-  // Expose the internal <video> to parent via forwarded ref
-  useImperativeHandle(ref, () => internalRef.current as HTMLVideoElement);
+    // Expose the video DOM node if parent wants it
+    useImperativeHandle(ref, () => videoRef.current!);
 
-  useEffect(() => {
-    const video = internalRef.current;
-    if (!video) return;
+    // Attach HLS or native src once
+    useEffect(() => {
+      const video = videoRef.current!;
+      let hls: Hls | null = null;
 
-    let hls: Hls | null = null;
-    const isHls = src.endsWith('.m3u8');
+      // iOS inline attributes
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', 'true');
 
-    if (isHls && Hls.isSupported()) {
-      hls = new Hls();
-      hls.loadSource(src);
-      hls.attachMedia(video);
-    } else {
-      // Fallback to native playback
-      video.src = src;
-    }
-
-    return () => {
-      if (hls) {
-        hls.destroy();
+      if (src.endsWith('.m3u8') && Hls.isSupported()) {
+        hls = new Hls();
+        hls.loadSource(src);
+        hls.attachMedia(video);
+      } else {
+        video.src = src;
       }
+
+      return () => {
+        if (hls) hls.destroy();
+      };
+    }, [src]);
+
+    // Once metadata arrives, compute 5s snippet window, preload initial second, then pause
+    useEffect(() => {
+      const v = videoRef.current!;
+      const onMeta = () => {
+        const mid = v.duration / 2;
+        setClipStart(Math.max(mid - 2.5, 0));
+        setClipEnd(Math.min(mid + 2.5, v.duration));
+
+        // Play first second to buffer initial segment
+        v.muted = true;
+        v.currentTime = Math.max(mid - 2.5, 0);
+        v.play().catch(() => {});
+        // After 1s, pause and rewind to start
+        setTimeout(() => {
+          v.pause();
+          // v.currentTime = 0;
+        }, 0);
+
+        v.removeEventListener('loadedmetadata', onMeta);
+      };
+
+      v.addEventListener('loadedmetadata', onMeta);
+      return () => v.removeEventListener('loadedmetadata', onMeta);
+    }, [src]);
+
+    // Pause when we reach the end of our snippet
+    useEffect(() => {
+      const v = videoRef.current!;
+      const onTime = () => {
+        if (v.currentTime >= clipEnd) {
+          v.pause();
+        }
+      };
+      v.addEventListener('timeupdate', onTime);
+      return () => v.removeEventListener('timeupdate', onTime);
+    }, [clipEnd]);
+
+    const handleMouseEnter = () => {
+      const v = videoRef.current!;
+      v.currentTime = clipStart;
+      v.muted = true;
+      v.play().catch(() => {});
     };
-  }, [src]);
 
-  return (
-    <video
-      ref={internalRef}
-      poster={poster}
-      {...videoProps}
-      playsInline
-      webkit-playsinline="true"
-    />
-  );
-});
+    const handleMouseLeave = () => {
+      const v = videoRef.current!;
+      v.pause();
+      v.currentTime = clipStart;
+    };
 
-HlsVideo.displayName = 'HlsVideo';
-export default HlsVideo;
+    return (
+      <div
+        className="relative overflow-hidden"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <video
+          ref={videoRef}
+          className={className}
+          preload="metadata"
+          muted
+          loop={false}
+          controls={false}
+        />
+      </div>
+    );
+  }
+);
+
+HoverPreviewVideo.displayName = 'HoverPreviewVideo';
+export default HoverPreviewVideo;
