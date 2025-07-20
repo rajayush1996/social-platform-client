@@ -75,13 +75,7 @@ const VideosPage = () => {
             {videos.map((video) => (
               <VideoCard
                 key={video._id}
-                id={video._id}
-                thumbnail={video.thumbnail?.url}
-                title={video.title || 'Untitled Video'}
-                author={video.user?.username || 'Unknown Author'}
-                views={video.views || 0}
-                duration={video.videoSpecific?.duration || '0:00'}
-                previewUrl={video.mediaFile.url}
+                v={video}
               />
             ))}
           </div>

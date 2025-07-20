@@ -2,7 +2,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReel } from '@/hooks/useReel'; // custom hook to fetch single reel
-import { useVideoDuration } from '@/hooks/useVideoDuration';
+// import { useVideoDuration } from '@/hooks/useVideoDuration';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX } from 'lucide-react';
 
@@ -11,7 +11,9 @@ export default function ReelPage() {
   const navigate = useNavigate();
   const { data: reel, isLoading, isError } = useReel(id!);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const duration = useVideoDuration(reel?.mediaFileUrl || '');
+  // const duration = useVideoDuration(reel?.mediaFileUrl || '');
+  const duration = 0;
+
   const [muted, setMuted] = React.useState(true);
 
   useEffect(() => {

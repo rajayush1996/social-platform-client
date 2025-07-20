@@ -110,7 +110,6 @@ const VideoDetail = () => {
   // video event listeners
   useEffect(() => {
     const v = videoRef.current;
-    console.log("🚀 ~ :36 ~ useEffect ~ v:", v?.duration)
     if (!v) return;
     const onTime = () => setCurrentTime(v.currentTime);
     const onMeta = () => setDuration(v.duration);
@@ -145,7 +144,7 @@ const VideoDetail = () => {
   }, [currentTime, duration, skip]);
 
 
- 
+
   const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     setVolume(val);
@@ -228,8 +227,8 @@ const VideoDetail = () => {
         >
           <HlsVideo
             ref={videoRef}
-            src={video.mediaFile.url}
-            poster={video.thumbnail?.url}
+            src={video.videoUrl}
+            poster={video.thumbnailUrl}
             className="w-full h-auto bg-black cursor-pointer"
             playsInline
             onClick={togglePlay}
@@ -299,7 +298,7 @@ const VideoDetail = () => {
         <div className="max-w-4xl mx-auto mt-6 text-white space-y-2">
           <h1 className="text-3xl font-bold">{video.title}</h1>
           <p className="text-sm text-gray-400">
-            By {video.user.username} • {video.views} views •{" "}
+            By {video.username || 'UnKnown' } • {video.views} views •{" "}
             {formatTime(duration)}
           </p>
           {video.description && (

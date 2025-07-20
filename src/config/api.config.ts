@@ -25,7 +25,7 @@ export const API_CONFIG = {
       // Content
       HOME: '/user/home',
       CATEGORIES: '/user/categories',
-      TRENDING_VIDEOS: '/user/home/trending',
+      TRENDING_VIDEOS: '/user/home/videos',
       BLOGS: '/user/blogs',
       BLOGS_DETAIL: (id: string) => `/user/blogs/${id}`,
       BLOGS_COMMENTS: (id: string) => `/user/blogs/${id}/comments`,

@@ -1,79 +1,74 @@
 // pages/Index.tsx
 import { useState } from "react";
 import Layout from "@/components/Layout";
-import { useHomeContentInfinite, useTrendingVideos } from "@/hooks/useHome";
+// import { useHomeContentInfinite, useVideos } from "@/hooks/useHome";
 import CategoryNav from "@/components/CategoryNav";
-import HeroSlider from "./HeroSlider";
-import { TrendingReels } from "./TrendingReels";
-import { FeaturedVideos } from "./FeaturedVideos";
-import { FeaturedBlogs } from "./FeaturedBlogs";
-import { NoContentFallback } from "./NoContentFallback";
-import { TrendingVideos } from "./TrendingVideos";
-import EarnBanner from "@/components/EarnBanner";
-import { useCategories } from "@/hooks/useCategories";
-import { useNavigate } from "react-router-dom";
-import { BounceLoader } from "react-spinners";
+import TrendingReels from "./TrendingReels";
+import FeaturedVideos from "./FeaturedVideos";
+import TrendingVideos from "./TrendingVideos";
+
+
+// infinite for “latestVideos”
+  // const {
+  //   data: homePages,
+  //   isLoading,
+  //   isError,
+  //   fetchNextPage,
+  //   hasNextPage,
+  //   isFetchingNextPage,
+  // } = useHomeContentInfinite(
+  //   { categoryId: category === "all" ? undefined : category },
+  //   latestLimit
+  // );
+  // const isLoading = true;
+
+  // const {
+  //   data: trData,
+  //   isLoading: trLoading,
+  //   isError: trError,
+  // } = useVideos({ page: trPage, limit: trLimit });
+
+  
+  // if (trLoading) {
+  //   return (
+  //     <Layout>
+  //       {/* full‐screen backdrop */}
+  //       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+  //         <BounceLoader
+  //           color="#ec4899"
+  //           loading={true}
+  //           size={250}
+  //           aria-label="Loading content"
+  //           data-testid="bounce-loader"
+  //         />
+  //       </div>
+  //     </Layout>
+  //   );
+  // }
+  // if (trError || !trData) {
+  //   return (
+  //     <Layout>
+  //       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+  //         <span className="text-lg text-muted-foreground">
+  //           Failed to load content.
+  //         </span>
+  //       </div>
+  //     </Layout>
+  //   );
+  // }
+
+  // // flatten
+
 
 export default function Index() {
   const [category, setCategory] = useState("all");
   const latestLimit = 12;
  
   // classic pagination for trendingVideos
-  const [trPage, setTrPage] = useState(1);
+  // const [trPage, setTrPage] = useState(1);
   const [trLimit, setTrLimit] = useState(12);
 
-  // infinite for “latestVideos”
-  const {
-    data: homePages,
-    isLoading,
-    isError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useHomeContentInfinite(
-    { categoryId: category === "all" ? undefined : category },
-    latestLimit
-  );
-  // const isLoading = true;
-
-  const {
-    data: trData,
-    isLoading: trLoading,
-    isError: trError,
-  } = useTrendingVideos({ page: trPage, limit: trLimit });
-
   
-  if (isLoading) {
-    return (
-      <Layout>
-        {/* full‐screen backdrop */}
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <BounceLoader
-            color="#ec4899"
-            loading={true}
-            size={250}
-            aria-label="Loading content"
-            data-testid="bounce-loader"
-          />
-        </div>
-      </Layout>
-    );
-  }
-  if (isError || !homePages) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">
-            Failed to load content.
-          </span>
-        </div>
-      </Layout>
-    );
-  }
-
-  // flatten
-  const allLatest = homePages.pages.flatMap((p) => p.latestVideos.results);
-
   return (
     <Layout>
       <CategoryNav
@@ -86,16 +81,13 @@ export default function Index() {
       </section> */}
 
       <section className="md:mx-12">
-        <TrendingReels reels={homePages.pages[0].trendingReels.results} />
+        <TrendingReels category={category}/>
 
         <FeaturedVideos
-          videos={allLatest}
-          onLoadMore={fetchNextPage}
-          hasMore={Boolean(hasNextPage)}
-          isLoadingMore={isFetchingNextPage}
+          category={category}
         />
 
-        <FeaturedBlogs blogs={homePages.pages[0].trendingBlogs.results} />
+        {/* <FeaturedBlogs blogs={homePages.pages[0].trendingBlogs.results} /> */}
 
         <section className="container flex items-center gap-4 mb-4">
           <label
@@ -135,6 +127,11 @@ export default function Index() {
           </div>
         </section>
 
+        <TrendingVideos
+            category={category}
+            initialLimit={trLimit}
+          />
+{/* 
         {trLoading ? (
           <div className="flex justify-center space-x-2 py-8">
             <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce" />
@@ -158,7 +155,7 @@ export default function Index() {
           homePages.pages[0].trendingBlogs.results.length === 0 &&
           homePages.pages[0].trendingReels.results.length === 0 && (
             <NoContentFallback />
-          )}
+          )} */}
       </section>
     </Layout>
   );

@@ -1,57 +1,80 @@
+// components/TrendingVideos.tsx
+import { useState } from "react";
+import { BounceLoader } from "react-spinners";
+import { usePaginatedContent } from "@/hooks/useHome";
 import VideoCard from "@/components/videos/VideoCard";
 import { Video } from "@/types/api.types";
 
-interface TrendingVideosProps {
-  videos: Video[];                   // videos on the current page
-  page: number;                      // current page index (1‑based)
-  totalPages: number;                // total number of pages available
-  onPageChange: (page: number) => void; // callback when user clicks a page button
-}
+export default function TrendingVideos({
+  category,
+  initialLimit = 12,
+}: {
+  category: string;
+  initialLimit?: number;
+}) {
+  const [page, setPage] = useState(1);
 
-export function TrendingVideos({
-  videos,
-  page,
-  totalPages,
-  onPageChange,
-}: TrendingVideosProps) {
-  if (!videos?.length) return null;
+  const {
+    items: videos,
+    isLoading,
+    isError,
+    currentPage,
+    totalPages,
+  } = usePaginatedContent<Video>({
+    page,
+    limit: initialLimit,
+    type: "videos",
+    filter: "trending",
+    category,
+  });
 
-  // build an array like [1,2,3,...]
+  if (isLoading) {
+    return (
+      <div className="py-12 flex justify-center">
+        <BounceLoader size={50} color="#ec4899" />
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <p className="py-12 text-center text-red-500">
+        Failed to load trending videos.
+      </p>
+    );
+  }
+  if (!videos.length) {
+    return null;
+  }
+
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
     <section className="mt-12 mb-12">
       <div className="container mx-auto px-4">
+        {/* header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">Trending Videos</h2>
           <button
-            onClick={() => window.location.href = "/videos?filter=trending"}
+            onClick={() => (window.location.href = "/videos?filter=trending")}
             className="text-pink-500 hover:underline text-sm"
           >
             View All
           </button>
         </div>
 
+        {/* grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {videos.map((video) => (
-            <VideoCard
-              key={video._id || video.id}
-              id={video._id || video.id}
-              thumbnail={video?.thumbnailDetails?.url || ""}
-              title={video.title}
-              author={video.categoryId?.name || "Unknown"}
-              views={video.stats?.views || 0}
-              duration={video.videoSpecific?.duration || "0:00"}
-              previewUrl={video.mediaDetails.url || ""}
-            />
+            <VideoCard key={video._id || video.id} v={video} />
           ))}
         </div>
 
+        {/* classic pagination below */}
         {totalPages > 1 && (
           <nav className="flex items-center justify-center mt-8 space-x-2">
             <button
-              onClick={() => onPageChange(page - 1)}
-              disabled={page === 1}
+              onClick={() => setPage(currentPage - 1)}
+              disabled={currentPage === 1}
               className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
             >
               Prev
@@ -60,9 +83,9 @@ export function TrendingVideos({
             {pages.map((p) => (
               <button
                 key={p}
-                onClick={() => onPageChange(p)}
+                onClick={() => setPage(p)}
                 className={`px-3 py-1 rounded transition ${
-                  p === page
+                  p === currentPage
                     ? "bg-pink-500 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -72,8 +95,8 @@ export function TrendingVideos({
             ))}
 
             <button
-              onClick={() => onPageChange(page + 1)}
-              disabled={page === totalPages}
+              onClick={() => setPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
               className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
             >
               Next

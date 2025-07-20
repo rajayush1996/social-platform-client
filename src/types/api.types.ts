@@ -119,28 +119,11 @@ export interface Video {
   status: 'published' | 'draft' | 'archived';
   views: number;
   deletedAt: string | null;
-  videoSpecific: {
-    mediaMetaId: string;
-    duration: string;
-  };
+  videoUrl: string
   createdAt: string;
   updatedAt: string;
-  mediaFile: {
-    url: string;
-  };
-  thumbnail: {
-    url: string;
-  };
+  thumbnailUrl: string;
   duration: string;
-  user?: {
-    username: string;
-  };
-  mediaDetails?: {
-    url: string;
-  }
-  thumbnailDetails?: {
-    url: string;
-  };
   categoryId?: {
     _id: string;
     name: string;
@@ -150,6 +133,7 @@ export interface Video {
   };
   id?: string;
   description?: string;
+  username?: string;
 }
 
 export interface Reel extends BaseContent {

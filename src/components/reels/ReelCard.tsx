@@ -1,57 +1,53 @@
-import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Volume2, VolumeX } from 'lucide-react';
-import { useVideoDuration } from '@/hooks/useVideoDuration';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// components/reels/ReelCard.tsx
+import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import { Volume2, VolumeX } from "lucide-react";
+import { formatDuration } from "@/lib/utils";
+import { Card } from "../ui/card";
 
-/**
- * Renders a single reel card with thumbnail or hover-video preview,
- * duration badge (calculated via useVideoDuration), and mute toggle.
- * The Card retains its large aspect ratio (big size).
- */
-export default function ReelCard({ reel }) {
-  const { id, title, user, stats, thumbnailDetails, mediaDetails } = reel;
+export default function ReelCard({ reel }: { reel: any }) {
+  const { mediaId, title, stats, previewUrl, thumbnailUrl, videoUrl } = reel;
 
-  // Calculate duration via hook if not explicitly provided
-  const duration = useVideoDuration(mediaDetails.url || '');
+  // show duration (mm:ss) from actual streaming URL
+  const duration = formatDuration(reel.lengthSec);
 
-  const formattedViews = stats?.views >= 1e6
-    ? `${(stats.views / 1e6).toFixed(1)}M`
-    : stats?.views >= 1e3
+  // format views if available
+  const formattedViews = stats?.views
+    ? stats.views >= 1e6
+      ? `${(stats.views / 1e6).toFixed(1)}M`
+      : stats.views >= 1e3
       ? `${(stats.views / 1e3).toFixed(1)}K`
-      : stats?.views?.toString() || '0';
+      : `${stats.views}`
+    : "0";
 
   const [hovered, setHovered] = useState(false);
   const [muted, setMuted] = useState(true);
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleMouseEnter = () => {
     setHovered(true);
-    const vid = videoRef.current;
-    if (!thumbnailDetails?.url && vid) {
+    // if there’s no preview image, play a 5s video snippet for hover preview
+    if (!previewUrl && videoRef.current) {
+      const vid = videoRef.current;
       vid.muted = muted;
       vid.currentTime = 0;
       vid.play().catch(() => {});
-
-      // stop at 5s for a quick hover preview
       const onTimeUpdate = () => {
         if (vid.currentTime >= 5) {
           vid.pause();
-          vid.removeEventListener('timeupdate', onTimeUpdate);
+          vid.removeEventListener("timeupdate", onTimeUpdate);
         }
       };
-      vid.addEventListener('timeupdate', onTimeUpdate);
+      vid.addEventListener("timeupdate", onTimeUpdate);
     }
   };
 
   const handleMouseLeave = () => {
     setHovered(false);
-    const vid = videoRef.current;
-    if (!thumbnailDetails?.url && vid) {
-      vid.pause();
-      vid.currentTime = 0;
-      // remove any leftover listener
-      vid.removeEventListener('timeupdate', () => {});
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
     }
   };
 
@@ -66,42 +62,50 @@ export default function ReelCard({ reel }) {
   };
 
   return (
-    <Link to={`/reels`}>      
+    <Link to={`/reels/${mediaId}`}>
       <Card
-        className="overflow-hidden relative h-[500px]  lg:h-[500px] lg:w-[350px]"
+        className="overflow-hidden relative h-[500px] lg:h-[500px] lg:w-[350px]"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div className="aspect-video w-full h-full relative bg-black">
-          {!thumbnailDetails?.url ? (
+          {/* switch between thumbnail, preview image, or video */}
+          {!hovered ? (
+            <img
+              src={thumbnailUrl}
+              alt={title}
+              className="w-full h-full object-cover"
+              crossOrigin="anonymous"
+            />
+          ) : previewUrl ? (
+            <img
+              src={previewUrl}
+              alt={title}
+              className="w-full h-full object-cover"
+              crossOrigin="anonymous"
+            />
+          ) : (
             <video
-              ref={(el) => (videoRef.current = el)}
-              src={mediaDetails.url}
+              ref={videoRef}
+              src={videoUrl}
               muted={muted}
               loop
               playsInline
               preload="auto"
               className="w-full h-full object-cover"
             />
-          ) : (
-            <img
-              src={thumbnailDetails.url}
-              alt={title}
-              className="w-full h-full object-cover"
-              crossOrigin="anonymous"
-            />
           )}
 
-          {/* Mute toggle */}
+          {/* mute/unmute */}
           <button
             onClick={toggleMute}
             className="absolute top-2 right-2 bg-black/60 rounded-full p-1 z-10"
-            title={muted ? 'Unmute' : 'Mute'}
+            title={muted ? "Unmute" : "Mute"}
           >
             {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
           </button>
 
-          {/* Duration badge */}
+          {/* duration badge */}
           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded z-10">
             {duration}
           </div>
@@ -112,7 +116,6 @@ export default function ReelCard({ reel }) {
             {title}
           </h3>
           <div className="flex justify-between text-sm text-foreground/70">
-            <span>{user?.displayName || 'Unknown'}</span>
             <span>{formattedViews} views</span>
           </div>
         </div>
