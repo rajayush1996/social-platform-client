@@ -10,7 +10,8 @@ interface VideoListParams {
   categoryId?: string;
   sort?: 'trending' | 'latest' | 'popular';
   duration?: 'short' | 'medium' | 'long';
-  featured?: boolean;
+  recommend?: boolean;
+  selectedMediaId?: string;
 }
 
 interface VideoListResponse {
@@ -27,7 +28,7 @@ interface VideoListResponse {
   };
 }
 
-export const useVideos = (params: VideoListParams = {}) => {
+export const useVideos = (params: VideoListParams = {page: 1, limit: 12, selectedMediaId: null }) => {
   return useQuery({
     queryKey: ['videos', params],
     queryFn: async () => {
