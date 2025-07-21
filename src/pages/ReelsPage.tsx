@@ -33,26 +33,33 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false); // Default to false, controlled by IntersectionObserver
   const [videoError, setVideoError] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [muted, setMuted] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null); // This is the Card's root div
+  const [muted, setMuted] = useState(true); // Start muted as per Instagram behavior
+
+  // NEW STATE: To track if the reel card is currently in view
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
     const node = containerRef.current;
-    const vid = videoRef.current;
-    if (!node || !vid) return;
+    if (!node) return;
 
     const obs = new IntersectionObserver(
       ([entry]) => {
+        setIsInView(entry.isIntersecting); // Update isInView state
         if (entry.isIntersecting) {
-          vid.play().catch(() => { });
-          setPlaying(true);
+          // When entering view
+          // We don't call play() here directly anymore.
+          // The HlsVideo component will handle loading based on isInView.
+          // We'll let `playing` state be set by the video's actual `onPlay` event if it autoplays.
+          setVideoLoading(true); // Reset loading state when it comes into view
         } else {
-          vid.pause();
-          setPlaying(false);
+          // When leaving view
+          setPlaying(false); // Explicitly set playing to false
+          setVideoLoading(true); // Reset loading state when it goes out of view
         }
       },
       { threshold: 0.6 } // when 60% of card is visible
@@ -62,7 +69,26 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
     return () => {
       obs.disconnect();
     };
-  }, []);
+  }, []); // Empty dependency array: runs once per ReelCard instance
+
+  // Effect to manage video playback based on isInView
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    if (isInView) {
+      vid.play().catch((e) => {
+        // Handle autoplay policy issues
+        console.warn("Autoplay prevented:", e);
+        setPlaying(false); // Ensure playing state is false if autoplay fails
+      });
+      setPlaying(true);
+    } else {
+      vid.pause();
+      setPlaying(false);
+      vid.currentTime = 0; // Reset video to start when out of view
+    }
+  }, [isInView]); // Re-run when isInView changes
 
   // Like animation
   const handleLike = () => {
@@ -76,7 +102,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
     if (playing) {
       videoRef.current.pause();
     } else {
-      videoRef.current.play();
+      videoRef.current.play().catch(() => {}); // Catch play errors
     }
     setPlaying((p) => !p);
   };
@@ -102,19 +128,19 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
     const v = videoRef.current;
     if (!v) return;
 
-    // flip the muted flag
     v.muted = !v.muted;
     setMuted(v.muted);
 
     // if we’re unmuting, make sure it’s playing (and at full volume)
     if (!v.muted) {
       v.volume = 1;
-      v.play().catch(() => { });
+      v.play().catch(() => { }); // Catch play errors
     }
   };
 
   return (
     <Card
+      ref={containerRef} // Assign containerRef to the Card's root div
       className="rounded-[2rem] shadow-xl p-0 overflow-hidden border border-border bg-gradient-to-br from-[#1c1c2c]/80 to-[#28243D]/80 backdrop-blur-xl group relative"
       style={{ perspective: "1200px" }}
     >
@@ -157,7 +183,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
           </button>
           {videoError ? (
             <div
-              ref={containerRef}
+              // ref={containerRef} // This ref should stay on the Card component
               className="flex flex-col items-center justify-center w-full h-full"
             >
               <img
@@ -173,7 +199,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
             </div>
           ) : (
             <>
-              {videoLoading && (
+              {videoLoading && isInView && ( // Only show loader if in view and loading
                 <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40">
                   <Loader2 className="h-10 w-10 text-reel-purple-500 animate-spin" />
                 </div>
@@ -181,10 +207,15 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
               <ReelVideoPlayer
                 ref={videoRef}
                 src={reel.mediaFileUrl || ''}
+                shouldLoad={isInView} // Pass the new prop here
                 className="w-full h-full object-cover rounded-t-[2rem]"
-                onError={() => setVideoError(true)}
+                onError={() => {
+                  setVideoError(true);
+                  setVideoLoading(false); // Stop loading if error
+                }}
                 onLoadedData={() => setVideoLoading(false)}
                 onClick={togglePlay}
+                muted={muted} // Pass muted state to the player
               />
               {/* Play/Pause overlay */}
               <button
