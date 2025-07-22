@@ -43,14 +43,12 @@ const ReelVideoPlayer = forwardRef<HTMLVideoElement, HlsVideoProps>(({
       if (hlsInstanceRef.current) {
         hlsInstanceRef.current.destroy(); // Destroy the Hls.js instance
         hlsInstanceRef.current = null;
-        console.log(`[HlsReel] HLS destroyed for: ${src}`);
       }
       // For native playback or when unloading HLS, clear the video source
       // This stops buffering and frees up resources.
       if (video.src) { // Only clear if a source is set
         video.removeAttribute('src'); // Clear src attribute
         video.load(); // Tell the video element to reload (which effectively unloads)
-        console.log(`[HlsReel] Video source cleared for: ${src}`);
       }
       // If it's a non-HLS video and shouldLoad is true, set src directly
       if (shouldLoad && !isHls) {
@@ -65,7 +63,6 @@ const ReelVideoPlayer = forwardRef<HTMLVideoElement, HlsVideoProps>(({
       if (hlsInstanceRef.current) {
         hlsInstanceRef.current.destroy();
         hlsInstanceRef.current = null;
-        console.log(`[HlsReel] HLS destroyed on cleanup for: ${src}`);
       }
       // Ensure video source is cleared on unmount too
       if (video.src) {

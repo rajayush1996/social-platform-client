@@ -52,7 +52,13 @@ export default function ReelsNavigation() {
 
       {/* Desktop/Tablet Sidebars */}
       {/* Left Sidebar */}
-      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:flex flex-col justify-between h-screen w-48 bg-background/80 border-r border-border shadow-lg z-40">
+      <aside className="
+          hidden md:fixed
+          md:top-[112px] md:bottom-0 md:left-0
+          md:flex flex-col justify-between
+          h-[calc(100vh-112px)] w-48
+          bg-background/80 border-r border-border shadow-lg z-40
+        ">
         {/* Middle: Nav Icons (row, icon left, text right) */}
         <div className="flex flex-col gap-2 pt-4 flex-1">
           {navItems.map((item, idx) => (
@@ -75,7 +81,13 @@ export default function ReelsNavigation() {
         </div>
       </aside>
       {/* Right Sidebar */}
-      <aside className="hidden md:fixed md:inset-y-0 md:right-0 md:flex flex-col justify-between h-screen w-48 bg-background/80 border-l border-border shadow-lg z-40">
+      <aside className="
+          hidden md:fixed
+          md:top-[112px] md:bottom-0 md:right-0
+          md:flex flex-col justify-between
+          h-[calc(100vh-112px)] w-48
+          bg-background/80 border-l border-border shadow-lg z-40
+        ">
         {/* Middle: Right Nav Icons (row, icon left, text right) */}
         <div className="flex flex-col gap-2 pt-4 flex-1">
           {rightNavItems.map((item, idx) => (
