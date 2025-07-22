@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
-import ReelsPage from "./pages/ReelsPage";
 import VideosPage from "./pages/VideosPage";
 import VideoDetail from "./pages/VideoDetail";
 import BlogPage from "./pages/BlogPage";
@@ -20,6 +19,7 @@ import VerificationIdentityPage from "./pages/VerificationIdentityPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ActivateAccountPage from "./pages/ActivateAccountPage";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ReelsPage } from "./pages/ReelsPage";
 
 const queryClient = new QueryClient();
 
