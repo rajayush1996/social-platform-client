@@ -12,8 +12,10 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
  const isVideoDetail = /^\/videos\/[^/]+$/.test(location.pathname);
+ console.log("🚀 ~ :15 ~ Navbar ~ isVideoDetail:", isVideoDetail);
 
   const isLoginPage = location.pathname === "/login";
+  const isReels = location.pathname === '/reels'
   if (isLoginPage) return null;
 
   const onSearchSubmit = (e: React.FormEvent) => {
@@ -35,7 +37,7 @@ const Navbar = () => {
 
         {/* Search - only on md+ */}
         {
-          !isVideoDetail && !isLoginPage && (
+          !isVideoDetail && !isLoginPage && !isReels &&(
            <form
           onSubmit={onSearchSubmit}
           className="hidden md:flex items-center flex-1 max-w-md mx-6"

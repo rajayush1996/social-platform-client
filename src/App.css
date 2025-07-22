@@ -1,8 +1,18 @@
+:root {
+  --background: 240 15% 10%;         /* deep almost‑black purple */
+  --foreground: 0 0% 100%;           /* white text */
+  --card: 240 15% 15%;               /* slightly lighter charcoal */
+  --card-foreground: 0 0% 90%;       /* off‑white for text on cards */
+  --border: 240 15% 20%;             /* subtle dark border */
+  --ring: 240 15% 30%;               /* hover/focus ring */
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+
 }
 
 .logo {

@@ -1,106 +1,60 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// components/VideoCard.tsx
+
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { useRef, useState } from "react";
 import { formatDuration } from "@/lib/utils";
-// import { useVideoDuration } from '@/hooks/useVideoDuration';
 
-export interface VideoCardProps {
-  id: string;
-  thumbnail?: string;
-  title: string;
-  author: string;
-  views: number;
-  duration: string;
-  previewUrl: string;
-  category: string; // either .m3u8 or .mp4
-}
-
-const VideoCard = ({ v }: any) => {
+export default function VideoCard({ v }: any) {
   const {
     _id: id,
     thumbnailUrl: thumbnail,
+    previewUrl,
     title,
     author,
-    previewUrl,
-    category,
     lengthSec,
   } = v;
-  // const formattedViews = views >= 1e6
-  //   ? `${(views / 1e6).toFixed(1)}M`
-  //   : views >= 1e3
-  //     ? `${(views / 1e3).toFixed(1)}K`
-  //     : views;
 
-  // <-- this ref now points at the actual <video> inside HlsVideo
-
-  // Compute actual duration once metadata is loaded
-  // const trueDuration = useVideoDuration(previewUrl);\
-  const trueDuration = formatDuration(lengthSec);
-
-  // these drive you
-
-  // once metadata is loaded (duration known), pick 5s around midpoint
-
-  // pause once we hit the end of the clip
-
+  const duration = formatDuration(lengthSec);
   const videoRef = useRef<HTMLVideoElement>(null);
-  // hover state
   const [hovered, setHovered] = useState(false);
-
-  // precision: only auto‑play the preview clip
-  const handleMouseEnter = () => {
-    setHovered(true);
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {
-        /* swallow DOMException */
-      });
-    }
-  };
-  const handleMouseLeave = () => {
-    setHovered(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
 
   return (
     <Link to={`/videos/${id}`}>
       <Card
-        className="
-      overflow-hidden group hover:ring-2 hover:ring-pink-500 transition-all duration-300 
-      flex flex-col h-full
-    "
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        className="
+          flex flex-col h-full overflow-hidden
+          bg-card text-card-foreground
+          rounded-lg shadow-md
+          transition-all duration-300
+          hover:ring-2 hover:ring-pink-500
+        "
       >
-        {/* 1) Video */}
-        <div className="aspect-video relative overflow-hidden bg-black cursor-pointer flex-shrink-0">
+        {/* thumbnail/video */}
+        <div className="relative aspect-video flex-shrink-0 bg-black overflow-hidden">
           <img
             src={hovered && previewUrl ? previewUrl : thumbnail}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             crossOrigin="anonymous"
           />
-          <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-            {trueDuration || 0}
+          <div className="absolute bottom-2 right-2 bg-black/60 px-2 py-1 text-xs rounded text-white">
+            {duration}
           </div>
         </div>
 
-        {/* 2) Text block (fills remaining space) */}
-        <div className="p-4 flex-1 flex flex-col">
-          <h3 className="font-medium text-white mb-2 line-clamp-2">{title}</h3>
-          {/* push footer row to bottom */}
-          <div className="flex justify-between items-center text-sm text-white/70 mt-auto">
-            <p>{author || "Unknown"}</p>
-            <p>{0} views</p>
+        {/* text area */}
+        <div className="flex-1 p-4 flex flex-col">
+          <h3 className="font-medium mb-2 line-clamp-2 truncate">{title}</h3>
+          <div className="mt-auto flex justify-between text-sm text-card-foreground/70">
+            <span>{author || "Unknown"}</span>
+            <span>0 views</span>
           </div>
         </div>
       </Card>
     </Link>
   );
-};
-
-export default VideoCard;
+}

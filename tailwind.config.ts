@@ -19,11 +19,11 @@ export default {
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        border:     "hsl(var(--border))",
+        ring:       "hsl(var(--ring))",
+        input: "hsl(var(--input))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -124,5 +124,5 @@ export default {
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("@tailwindcss/line-clamp"), require("tailwindcss-animate")],
 } satisfies Config;

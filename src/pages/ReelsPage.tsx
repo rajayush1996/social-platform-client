@@ -62,7 +62,7 @@ export default function ReelsPage() {
         style={{ top: 'var(--header-height)' }}
       >
         {reels.map((r: any) => (
-          <div key={r.id} className="snap-start h-full flex justify-center">
+          <div key={r._id} className="snap-start h-full flex justify-center">
             <div className="w-full max-w-md h-full">
               <ReelCard reel={r}/>
             </div>
