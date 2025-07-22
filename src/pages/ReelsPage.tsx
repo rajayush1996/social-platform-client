@@ -206,7 +206,7 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
               )}
               <ReelVideoPlayer
                 ref={videoRef}
-                src={reel.mediaFileUrl || ''}
+                src={reel.videoUrl || ''}
                 shouldLoad={isInView} // Pass the new prop here
                 className="w-full h-full object-cover rounded-t-[2rem]"
                 onError={() => {
@@ -337,6 +337,7 @@ export default function ReelsPage() {
 
   // flatten all pages.results into one array
   const reels: Reel[] = data?.pages.flatMap((page) => page.results) ?? [];
+  console.log("🚀 ~ :361 ~ ReelsPage ~ reels:", reels)
 
   // infinite‐scroll observer
   useEffect(() => {

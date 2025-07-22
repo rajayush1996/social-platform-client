@@ -137,11 +137,19 @@ export interface Video {
 }
 
 export interface Reel extends BaseContent {
-  reelSpecific?: {
-    duration: string;
-    thumbnailMetadata: MediaMeta;
-    contentMetadata: MediaMeta;
-  };
+  id: string
+  title: string
+  description: string
+  category: string
+  videoUrl: string
+  previewUrl: string
+  thumbnailUrl: string
+  lengthSec: number
+  framerate: number
+  rotation: number
+  width: number
+  height: number
+  availableResolutions: string[]
 }
 
 // Creator Request Types

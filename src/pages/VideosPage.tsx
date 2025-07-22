@@ -4,12 +4,18 @@ import { useVideos } from "@/hooks/useVideo";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { BounceLoader } from "react-spinners";
+import { useSearchParams } from "react-router-dom";
 
 const VideosPage = () => {
   const [page, setPage] = useState(1);
   const limit = 16;
+  const [searchParams] = useSearchParams()
+  const category = searchParams.get('category');
+
+  // const { categoryId: rawCategoryId } = router.query
+
   // Pass page and limit to fetch paginated videos
-  const { data, isLoading, isError } = useVideos({ page, limit });
+  const { data, isLoading, isError } = useVideos({ page, limit, categoryId: category });
 
   if (isLoading) {
     return (

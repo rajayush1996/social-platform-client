@@ -24,9 +24,9 @@ export default function CategoryNav({
     })),
   ];
 
-  const handleCategoryChange = (id: string) => {
-    onCategoryChange(id);
-    navigate(`/videos?category=${id}`);
+  const handleCategoryChange = (cat: { id: string; name: string; }) => {
+    onCategoryChange(cat.id);
+    navigate(`/videos?name=${cat.name}&category=${cat.id}`);
   };
 
   if (categoriesLoading) {
@@ -53,7 +53,7 @@ export default function CategoryNav({
           return (
             <button
               key={cat.id}
-              onClick={() => handleCategoryChange(cat.id)}
+              onClick={() => handleCategoryChange(cat)}
               className={`
                 flex-shrink-0
                 text-sm font-medium px-4 py-2 rounded-full transition
