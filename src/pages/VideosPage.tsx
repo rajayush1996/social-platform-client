@@ -12,7 +12,7 @@ const VideosPage = () => {
   const limit = 16;
   const [searchParams] = useSearchParams();
   const catId = searchParams.get("category") || "all";
-
+  const searchByName = searchParams.get("q") || '';
   const [category, setCategory] = useState(catId);
 
   // const { categoryId: rawCategoryId } = router.query
@@ -22,6 +22,7 @@ const VideosPage = () => {
     page,
     limit,
     categoryId: category,
+    search: searchByName,
   });
 
   if (isLoading) {

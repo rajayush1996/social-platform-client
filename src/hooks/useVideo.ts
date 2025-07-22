@@ -12,6 +12,7 @@ interface VideoListParams {
   duration?: 'short' | 'medium' | 'long';
   recommend?: boolean;
   selectedMediaId?: string;
+  search?: string
 }
 
 interface VideoListResponse {

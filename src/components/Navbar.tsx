@@ -8,22 +8,26 @@ import { useAuth } from "@/hooks/useAuth";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  console.log("🚀 ~ :11 ~ Navbar ~ searchTerm:", searchTerm)
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
- const isVideoDetail = /^\/videos\/[^/]+$/.test(location.pathname);
- console.log("🚀 ~ :15 ~ Navbar ~ isVideoDetail:", isVideoDetail);
+  const isVideoDetail = /^\/videos\/[^/]+$/.test(location.pathname);
 
   const isLoginPage = location.pathname === "/login";
-  const isReels = location.pathname === '/reels'
+  const isReels = location.pathname === "/reels";
   if (isLoginPage) return null;
+
+  const handleSearch = () => {
+    const term = searchTerm.trim();
+    if (!term) return;
+    navigate(`/videos?q=${encodeURIComponent(term)}`);
+    setSearchTerm("");
+  };
 
   const onSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
-      setSearchTerm("");
-    }
+    handleSearch();
   };
 
   return (
@@ -36,26 +40,28 @@ const Navbar = () => {
         </Link>
 
         {/* Search - only on md+ */}
-        {
-          !isVideoDetail && !isLoginPage && !isReels &&(
-           <form
-          onSubmit={onSearchSubmit}
-          className="hidden md:flex items-center flex-1 max-w-md mx-6"
-        >
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search videos, reels, blogs…"
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            />
-          </div>
-        </form>
-          )
-        }
-       
+        {!isVideoDetail && !isLoginPage && !isReels && (
+          <form
+            onSubmit={onSearchSubmit}
+            className="hidden md:flex items-center flex-1 max-w-md mx-6"
+          >
+            <div className="relative w-full">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search videos, reels, blogs…"
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              />
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+              >
+                <Search />
+              </button>
+            </div>
+          </form>
+        )}
 
         {/* Desktop links */}
         <div className="hidden md:flex items-center space-x-6">
@@ -207,10 +213,7 @@ const Navbar = () => {
                 className="bg-reel-purple-600 hover:bg-reel-purple-700 w-full"
                 asChild
               >
-                <Link
-                  to="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   Login
                 </Link>
               </Button>
