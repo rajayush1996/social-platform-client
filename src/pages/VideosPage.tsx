@@ -5,12 +5,16 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { BounceLoader } from "react-spinners";
 import { useSearchParams } from "react-router-dom";
+import CategoryNav from "@/components/CategoryNav";
 
 const VideosPage = () => {
   const [page, setPage] = useState(1);
   const limit = 16;
-  const [searchParams] = useSearchParams()
-  const category = searchParams.get('category');
+  const [searchParams] = useSearchParams();
+  const catId = searchParams.get('category') || 'all';
+  
+  const [category, setCategory] =useState(catId);
+
 
   // const { categoryId: rawCategoryId } = router.query
 
@@ -20,6 +24,10 @@ const VideosPage = () => {
   if (isLoading) {
     return (
       <Layout>
+        <CategoryNav
+                activeCategory={category}
+                onCategoryChange={setCategory}
+        />
         {/* full‐screen backdrop */}
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <BounceLoader

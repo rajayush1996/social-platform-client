@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useInfiniteQuery } from '@tanstack/react-query'
 import axiosInstance from '@/lib/axios'
 import { API_CONFIG } from '@/config/api.config'
 
 
 export interface Reel {
+  videoUrl: any
   id: string
   type: 'reel'
   title: string
