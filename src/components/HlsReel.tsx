@@ -37,7 +37,6 @@ const ReelVideoPlayer = forwardRef<HTMLVideoElement, HlsVideoProps>(({
         hlsInstanceRef.current = new Hls();
         hlsInstanceRef.current.loadSource(src);
         hlsInstanceRef.current.attachMedia(video);
-        console.log(`[HlsReel] HLS loaded for: ${src}`);
       }
     } else {
       // If we should NOT load, or it's not an HLS stream, or Hls.js is not supported

@@ -19,7 +19,7 @@ import VerificationIdentityPage from "./pages/VerificationIdentityPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ActivateAccountPage from "./pages/ActivateAccountPage";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { ReelsPage } from "./pages/ReelsPage";
+import ReelsPage from "./pages/ReelsPage";
 
 const queryClient = new QueryClient();
 
