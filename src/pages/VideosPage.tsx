@@ -11,23 +11,22 @@ const VideosPage = () => {
   const [page, setPage] = useState(1);
   const limit = 16;
   const [searchParams] = useSearchParams();
-  const catId = searchParams.get('category') || 'all';
-  
-  const [category, setCategory] =useState(catId);
+  const catId = searchParams.get("category") || "all";
 
+  const [category, setCategory] = useState(catId);
 
   // const { categoryId: rawCategoryId } = router.query
 
   // Pass page and limit to fetch paginated videos
-  const { data, isLoading, isError } = useVideos({ page, limit, categoryId: category });
+  const { data, isLoading, isError } = useVideos({
+    page,
+    limit,
+    categoryId: category,
+  });
 
   if (isLoading) {
     return (
       <Layout>
-        <CategoryNav
-                activeCategory={category}
-                onCategoryChange={setCategory}
-        />
         {/* full‐screen backdrop */}
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <BounceLoader
@@ -46,7 +45,9 @@ const VideosPage = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-red-500">Failed to load videos. Please try again later.</span>
+          <span className="text-lg text-red-500">
+            Failed to load videos. Please try again later.
+          </span>
         </div>
       </Layout>
     );
@@ -58,18 +59,24 @@ const VideosPage = () => {
   if (videos.length === 0) {
     return (
       <Layout>
+      <CategoryNav activeCategory={category} onCategoryChange={setCategory} />
+
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <span className="text-lg text-muted-foreground">No videos available.</span>
+          <span className="text-lg text-muted-foreground">
+            No videos available.
+          </span>
         </div>
       </Layout>
     );
   }
 
   const handlePrev = () => setPage((p) => Math.max(1, p - 1));
-  const handleNext = () => setPage((p) => Math.min(pagination.totalPages, p + 1));
+  const handleNext = () =>
+    setPage((p) => Math.min(pagination.totalPages, p + 1));
 
   return (
     <Layout>
+      <CategoryNav activeCategory={category} onCategoryChange={setCategory} />
       {/* Header */}
       <section className="hero-gradient py-12 md:py-16">
         <div className="container px-4 mx-auto">
@@ -87,30 +94,39 @@ const VideosPage = () => {
         <div className="container px-4 mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {videos.map((video) => (
-              <VideoCard
-                key={video._id}
-                v={video}
-              />
+              <VideoCard key={video._id} v={video} />
             ))}
           </div>
 
           {/* Pagination */}
           <div className="flex justify-center items-center mt-10 space-x-2">
-            <Button onClick={handlePrev} disabled={page === 1} variant="outline">
+            <Button
+              onClick={handlePrev}
+              disabled={page === 1}
+              variant="outline"
+            >
               Previous
             </Button>
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((num) => (
-              <button
-                key={num}
-                onClick={() => setPage(num)}
-                className={`px-3 py-1 rounded ${
-                  page === num ? 'bg-pink-500 text-white' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {num}
-              </button>
-            ))}
-            <Button onClick={handleNext} disabled={page === pagination.totalPages} variant="outline">
+            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(
+              (num) => (
+                <button
+                  key={num}
+                  onClick={() => setPage(num)}
+                  className={`px-3 py-1 rounded ${
+                    page === num
+                      ? "bg-pink-500 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  {num}
+                </button>
+              )
+            )}
+            <Button
+              onClick={handleNext}
+              disabled={page === pagination.totalPages}
+              variant="outline"
+            >
               Next
             </Button>
           </div>
