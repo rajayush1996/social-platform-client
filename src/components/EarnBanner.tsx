@@ -29,7 +29,7 @@ export default function EarnBanner({ onClose }: EarnBannerProps) {
       {/* Centered content */}
       <div className="flex items-center justify-center space-x-4 py-3">
         <span className="font-medium text-white">💸 Earn money with us</span>
-        <Link to="/earn-money-with-us">
+        <Link to="/login">
           <Button size="sm" className="bg-white text-pink-600 hover:bg-gray-100 py-1 px-3">
             Learn More
           </Button>

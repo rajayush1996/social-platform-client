@@ -105,7 +105,7 @@ export default function VideoDetail() {
                 <div
                   key={rec.mediaId}
                   className="cursor-pointer"
-                  onClick={() => navigate(`/video/${rec.mediaId}`)}
+                  onClick={() => navigate(`/videos/${rec.mediaId}`)}
                 >
                   <img
                     src={rec.thumbnailUrl}
