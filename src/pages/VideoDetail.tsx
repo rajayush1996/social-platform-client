@@ -4,11 +4,19 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useVideo, useVideos } from "@/hooks/useVideo";
 import Layout from "@/components/Layout";
-import { useRef, useEffect, forwardRef, useImperativeHandle, useState } from "react";
+import {
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  useState,
+} from "react";
 import Hls from "hls.js";
 
 // HLS‐aware <video> wrapper
-type HlsVideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & { src: string };
+type HlsVideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & {
+  src: string;
+};
 const HlsVideo = forwardRef<HTMLVideoElement, HlsVideoProps>(
   ({ src, ...props }, ref) => {
     const vidRef = useRef<HTMLVideoElement>(null);
@@ -24,10 +32,20 @@ const HlsVideo = forwardRef<HTMLVideoElement, HlsVideoProps>(
       } else {
         v.src = src;
       }
-      return () => { if (hls) hls.destroy(); };
+      return () => {
+        if (hls) hls.destroy();
+      };
     }, [src]);
 
-    return <video ref={vidRef} {...props} playsInline webkit-playsinline="true" controls />;
+    return (
+      <video
+        ref={vidRef}
+        {...props}
+        playsInline
+        webkit-playsinline="true"
+        controls
+      />
+    );
   }
 );
 
@@ -47,7 +65,10 @@ export default function VideoDetail() {
   // SCROLL INTO VIEW on initial load
   useEffect(() => {
     if (!isLoading && video && containerRef.current && !hasScrolled) {
-      containerRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      containerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       containerRef.current.focus({ preventScroll: true });
       setHasScrolled(true);
     }
@@ -75,7 +96,11 @@ export default function VideoDetail() {
     <Layout>
       <div className="px-4 py-6">
         {/* Back button */}
-        <Button variant="ghost" className="mb-4 flex items-center gap-2" onClick={() => navigate(-1)}>
+        <Button
+          variant="ghost"
+          className="mb-4 flex items-center gap-2"
+          onClick={() => navigate(-1)}
+        >
           <ArrowLeft /> Back
         </Button>
 
@@ -94,26 +119,43 @@ export default function VideoDetail() {
           <p className="text-sm text-gray-400">
             By {video.username || "Unknown"} • {video.views} views
           </p>
-          {video.description && <p className="mt-2 text-gray-200">{video.description}</p>}
+          {video.description && (
+            <p className="mt-2 text-gray-200">{video.description}</p>
+          )}
         </div>
 
         {/* Recommended Videos */}
         {!recsLoading && recsData?.results?.length > 0 && (
           <div className="max-w-4xl mx-auto mt-8">
             <h2 className="text-2xl font-bold mb-4">Recommended Videos</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+
+            {/* 
+      - auto-rows-fr: makes every row the same height
+      - grid-cols-2/...: your responsive columns
+    */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 auto-rows-fr">
               {recsData.results.map((rec) => (
                 <div
                   key={rec._id}
-                  className="cursor-pointer"
                   onClick={() => navigate(`/videos/${rec._id}`)}
+                  className="cursor-pointer flex flex-col h-full bg-gray-800 rounded-lg overflow-hidden"
                 >
-                  <img
-                    src={rec.thumbnailUrl}
-                    alt={rec.title}
-                    className="w-full h-auto rounded-md"
-                  />
-                  <p className="mt-2 text-sm text-white">{rec.title}</p>
+                  {/* fixed 16:9 box */}
+                  <div className="relative pb-[56.25%]">
+                    <img
+                      src={rec.thumbnailUrl}
+                      alt={rec.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* flex-1 so this area always grows to fill the card */}
+                  <div className="p-2 flex-1">
+                    {/* clamp to 2 lines */}
+                    <p className="text-sm text-white line-clamp-2">
+                      {rec.title}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
