@@ -39,6 +39,7 @@ export default function VideoDetail() {
     selectedMediaId: id,
     recommend: true,
   });
+  console.log("🚀 ~ :42 ~ VideoDetail ~ recsData:", recsData);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -103,9 +104,9 @@ export default function VideoDetail() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {recsData.results.map((rec) => (
                 <div
-                  key={rec.mediaId}
+                  key={rec._id}
                   className="cursor-pointer"
-                  onClick={() => navigate(`/videos/${rec.mediaId}`)}
+                  onClick={() => navigate(`/videos/${rec._id}`)}
                 >
                   <img
                     src={rec.thumbnailUrl}
