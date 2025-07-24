@@ -23,8 +23,13 @@ import {
   useUploadCover,
 } from "@/hooks/api/useProfileApi";
 import Layout from "@/components/Layout";
-import { useUploadProfile } from "@/hooks/useUploadProfile";
+import { useUploadDocuments, useUploadProfile } from "@/hooks/useUploadProfile";
 import { config } from "@/config/config";
+import { useCreateCreatorRequest } from "@/hooks/useCreator";
+import { toast } from 'sonner';
+
+
+
 
 const TABS = [
   { key: "posts", label: "Posts", icon: User },
@@ -36,8 +41,8 @@ const TABS = [
 
 const ProfilePage = () => {
   const { profile, logout } = useAuth();
-  const [file, setFile] = useState<File | null>(null);
-  const [savedUrl, setSavedUrl] = useState<string>("");
+  const [file, setFile] = useState<File[]| null>(null);
+  const [savedUrl, setSavedUrl] = useState<string[]>([]);
   const { mutate: updateProfile } = useUpdateProfile();
   const { mutate: uploadAvatar } = useUploadAvatar();
   const { mutate: uploadCover } = useUploadCover();
@@ -75,23 +80,39 @@ const ProfilePage = () => {
   });
 
   // creator section ------------------------
-  const { uploadProfile, uploading, progress, error, profileUrl } =
-    useUploadProfile({
+  const { uploadDocuments, uploading, progress, error, documentUrls } =
+    useUploadDocuments({
       storageZoneName: config.storageZoneName,
       accessKey: config.accessKey,
+      pullZoneUrl: config.pullZoneUrl
   });
+
+
+  const {
+    submitRequest,
+    isLoading:   reqLoading,
+    error:       reqError,
+  } = useCreateCreatorRequest()
 
   async function handleCreatorSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
 
     if (!file) return;
     try {
-      const url = await uploadProfile(file);
-      console.log("🚀 ~ :90 ~ handleCreatorSubmit ~ url:", url);
-      setSavedUrl(url);
-      // TODO: send `url` to your backend to update the user's profile record
+      await uploadDocuments(file);
+      await submitRequest({
+        reason:       creatorForm.reason,
+        contentFocus: creatorForm.contentFocus,
+        portfolio:    creatorForm.portfolio,
+        documents:    documentUrls,
+      })
+      toast.success("Your creator request was submitted!");
+      setCreatorForm({ reason: '', contentFocus: '', portfolio: '', documents: [] })
+      setFile(null)
+      setShowCreator(false)
     } catch (err) {
       console.error(err);
+       toast.error(err.message || "Something went wrong.");
     }
   }
 
@@ -99,7 +120,7 @@ const ProfilePage = () => {
     const files = e.target.files;
     if (!files) return;
     const newFiles = Array.from(files);
-    setFile(newFiles[0]); // preserve single‐file if you need it
+    setFile(newFiles); // preserve single‐file if you need it
     setCreatorForm((f) => ({
       ...f,
       // append, avoid dupes if you like

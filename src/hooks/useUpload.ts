@@ -12,6 +12,8 @@ export interface BunnyUploadConfig {
   accessKey: string;
   /** Optional base URL (default: https://storage.bunnycdn.com) */
   baseURL?: string;
+
+  pullZoneUrl?: string;
 }
 
 /**
@@ -31,7 +33,7 @@ export interface BunnyUploadResult {
   /** Captured error for failed uploads, if any */
   error: Error | null;
   /** List of successfully uploaded file URLs */
-  urls: string[];
+  urls?: string[];
 }
 
 /**
@@ -42,11 +44,11 @@ export interface BunnyUploadResult {
 export function useBunnyUpload(
   config: BunnyUploadConfig
 ): BunnyUploadResult {
-  const { storageZoneName, accessKey, baseURL = 'https://storage.bunnycdn.com' } = config;
+  const { storageZoneName, accessKey, baseURL = 'https://storage.bunnycdn.com', pullZoneUrl } = config;
   const [uploading, setUploading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<Error | null>(null);
-  const [urls, setUrls] = useState<string[]>([]);
+  const [urls, setUrls] = useState<string[]>([]) 
   const [name, setName] = useState<string[]>([]);
   const uploadFiles = useCallback<
     (files: FileList | File[], path?: string) => Promise<string[]>
@@ -56,7 +58,7 @@ export function useBunnyUpload(
     setProgress(0);
     const fileArray: File[] = Array.from(files as FileList);
     const uploadedUrls: string[] = [];
-
+    const cdnUrls: string[] = [];
     for (const file of fileArray) {
       // generate random filename with original extension
       const ext = file.name.includes('.') ? `.${file.name.split('.').pop()}` : '';
@@ -65,7 +67,7 @@ export function useBunnyUpload(
       setName(newNameArr);
       const filePath = path ? `${path}/${randomName}` : randomName;
       const uploadURL = `${baseURL}/${storageZoneName}/${filePath}`;
-
+      const cdnEndpoint    = `${pullZoneUrl}/${filePath}`;
       try {
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
@@ -90,6 +92,7 @@ export function useBunnyUpload(
           xhr.onerror = () => reject(new Error('Network error during upload'));
           xhr.send(file);
         });
+        cdnUrls.push(cdnEndpoint);
       } catch (err) {
         setError(err as Error);
         setUploading(false);
@@ -97,10 +100,10 @@ export function useBunnyUpload(
       }
     }
 
-    setUrls(uploadedUrls);
     setUploading(false);
-    return name;
-  }, [name, baseURL, storageZoneName, accessKey]);
+    setUrls(cdnUrls);
+    return cdnUrls;
+  }, [name, baseURL, storageZoneName, pullZoneUrl, accessKey]);
 
   return { uploadFiles, uploading, progress, error, urls };
 }

@@ -28,3 +28,33 @@ export function useUploadProfile(config: BunnyUploadConfig): UploadProfileResult
     profileUrl: urls[0] || '',
   };
 }
+
+
+export interface UploadDocumentsResult {
+  uploadDocuments: (files: File[]) => Promise<string[]>
+  uploading:      boolean
+  progress:       number
+  error:          Error | null
+  documentUrls:   string[]      // all the URLs from the last batch
+}
+
+export function useUploadDocuments(
+  config: BunnyUploadConfig
+): UploadDocumentsResult {
+  const { uploadFiles, uploading, progress, error, urls } = useBunnyUpload(config)
+//   console.log("🚀 ~ :45 ~ urls:", urls);
+
+  // files → ["doc1.pdf","doc2.png",...] → Promise< ["…/documents/doc1.pdf", "…/documents/doc2.png", …] >
+  const uploadDocuments = async (files: File[]): Promise<string[]> => {
+    return await uploadFiles(files, "documents")
+  }
+
+  return {
+    uploadDocuments,
+    uploading,
+    progress,
+    error,
+    documentUrls: urls,
+  }
+}
+
