@@ -36,7 +36,6 @@ export const useUpdateProfile = () => {
 
 export const useCreatorRequest = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (data: { reason: string; portfolio: string }) => {
       const response = await axiosInstance.post(API_CONFIG.ENDPOINTS.CREATOR.REQUEST, data);

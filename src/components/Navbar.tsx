@@ -8,7 +8,6 @@ import { useAuth } from "@/hooks/useAuth";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  console.log("🚀 ~ :11 ~ Navbar ~ searchTerm:", searchTerm)
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
