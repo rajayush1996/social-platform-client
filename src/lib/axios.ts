@@ -1,10 +1,18 @@
 import axios from 'axios';
 import { API_CONFIG } from '@/config/api.config';
 import { useNavigate } from 'react-router-dom';
+import { getCookie, setCookie } from './utils';
+import Cookies from 'js-cookie'
+
 
 // Optionally, get token from localStorage or cookies
 function getAccessToken() {
   return localStorage.getItem('accessToken');
+}
+
+function getRefreshToken() {
+  const refresh = Cookies.get('refreshToken');
+  return Cookies.get('refreshToken') || localStorage.getItem('refreshToken');
 }
 
 const axiosInstance = axios.create({
@@ -24,29 +32,55 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for handling errors
+// Response interceptor for handling errors and refreshing token if expired
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // If token expired (401 Unauthorized error)
-    if (error.response && error.response.status === 401) {
-      // Optionally, clear the token from localStorage or cookies
-      localStorage.removeItem('accessToken');
+    const originalRequest = error.config;
 
-      // Redirect to login page
-      const navigate = useNavigate(); // Use useNavigate hook to navigate
-      navigate('/login'); // Or replace with your actual login path
+    // If the error is a 401 (Unauthorized) and the request hasn't been retried yet
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-      // Optionally show a toast or alert to inform the user
-      // toast.error("Session expired. Please log in again.");
+      try {
+        // const refreshToken = getRefreshToken();
+        // console.log("🚀 ~ :45 ~ refreshToken:", refreshToken);
 
-      // Reject the error to propagate it
-      return Promise.reject(error);
+        // if (!refreshToken) {
+        //   localStorage.removeItem('accessToken');
+        //   window.location.href = '/login'; // Redirect if no refresh token is found
+        //   return Promise.reject(error); // Exit the interceptor early if refreshToken is missing
+        // }
+
+        // Attempt to refresh the access token using the refresh token from cookies
+        const { data } = await axios.post(`/api/v1/${API_CONFIG.ENDPOINTS.AUTH.REFRESH_TOKEN}`);
+
+        // Store the new access token and refresh token in localStorage
+        localStorage.setItem('accessToken', data.accessToken);
+        setCookie('refreshToken', data.refreshToken); // Update refresh token in cookies
+
+        // Update the Authorization header with the new access token
+        originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
+
+        // Retry the original request with the new token
+        return axios(originalRequest);
+      } catch (refreshError) {
+        // Handle error during refresh token request
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; // Clear cookie
+
+        // Redirect to login page if refresh fails
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
     }
 
     // Handle other errors
     return Promise.reject(error);
   }
 );
+
+
 
 export default axiosInstance;
