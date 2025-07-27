@@ -52,12 +52,16 @@ axiosInstance.interceptors.response.use(
         //   return Promise.reject(error); // Exit the interceptor early if refreshToken is missing
         // }
 
+        const rawAxios = axios.create({ 
+          baseURL: API_CONFIG.BASE_URL,
+          withCredentials: true 
+        });
         // Attempt to refresh the access token using the refresh token from cookies
-        const { data } = await axios.post(`/api/v1/${API_CONFIG.ENDPOINTS.AUTH.REFRESH_TOKEN}`);
+        const { data } = await rawAxios.post(`${API_CONFIG.ENDPOINTS.AUTH.REFRESH_TOKEN}`);
 
         // Store the new access token and refresh token in localStorage
-        localStorage.setItem('accessToken', data.accessToken);
-        setCookie('refreshToken', data.refreshToken); // Update refresh token in cookies
+        localStorage.setItem('accessToken', data.data.accessToken);
+        // setCookie('refreshToken', data.refreshToken); // Update refresh token in cookies
 
         // Update the Authorization header with the new access token
         originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
