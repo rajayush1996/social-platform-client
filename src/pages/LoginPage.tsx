@@ -23,7 +23,7 @@ const LoginPage = () => {
   const { mutate: loginMutate, isPending } = useLogin();
 
   // Get the redirect path from location state, or default to '/'
-  const from = (location.state as { from?: string })?.from || '/';
+  const from = (location.state as { from?: string })?.from || '/profile';
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
