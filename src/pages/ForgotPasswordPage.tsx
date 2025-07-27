@@ -1,17 +1,39 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Mail, RefreshCcw } from 'lucide-react';
+import { RefreshCcw } from 'lucide-react';
+import { toast } from 'sonner'; // Assuming you're using Sonner for toasts
+import { useForgotPassword } from '@/hooks/api/useAuthApi'; // Importing the custom hook
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
+  const { mutateAsync, isPending: isLoading, isError, error } = useForgotPassword(); // Use mutateAsync
   const navigate = useNavigate();
 
-  const handleReset = (e: React.FormEvent) => {
+  const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Send reset link logic
+
+    // Check if the email is valid
+    if (!email) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      // Use mutateAsync to ensure it resolves as a promise
+      await mutateAsync(email);
+
+      // Show success message once the mutation is successful
+      toast.success('Reset link sent successfully! Please check your email.');
+
+      // Wait for the mutation to complete before navigating
+      navigate('/check-email'); // Navigate after successful completion
+    } catch (err) {
+      // If there's an error, show an error toast
+      toast.error('Failed to send reset link. Please try again.');
+    }
   };
 
   return (
@@ -35,7 +57,9 @@ const ForgotPasswordPage = () => {
               required
             />
           </div>
-          <Button type="submit" className="w-full">Send Reset Link</Button>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Sending...' : 'Send Reset Link'}
+          </Button>
         </form>
         <Button variant="outline" className="w-full" onClick={() => navigate('/login')}>Back to Login</Button>
       </Card>
@@ -43,4 +67,4 @@ const ForgotPasswordPage = () => {
   );
 };
 
-export default ForgotPasswordPage; 
+export default ForgotPasswordPage;

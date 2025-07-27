@@ -20,6 +20,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ActivateAccountPage from "./pages/ActivateAccountPage";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ReelsPage from "./pages/ReelsPage";
+import CheckEmailPage from "./pages/CheckEmail";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,8 @@ function App() {
               <Route path="/verify-identity" element={<VerificationIdentityPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/activate-account" element={<ActivateAccountPage />} />
+              <Route path="/check-email" element={<CheckEmailPage />} />
+              
 
               {/* Protected Routes */}
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '@/lib/axios';
 import { API_CONFIG } from '@/config/api.config';
 
@@ -125,3 +125,31 @@ export const useResendVerification = () => {
     },
   });
 }; 
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: async (email: string) => {
+      const { data } = await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
+      return data;
+    },
+  });
+};
+
+
+
+interface ResetPasswordResponse {
+  success: boolean;
+}
+
+interface ResetPasswordError {
+  message: string;
+}
+
+export const useResetPassword = () => {
+  return useMutation<ResetPasswordResponse, ResetPasswordError, string>({
+    mutationFn: async (password: string) => {
+      const { data } = await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.RESET_PASSWORD, { password });
+      return data;
+    },
+  });
+};
