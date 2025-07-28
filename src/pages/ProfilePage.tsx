@@ -26,10 +26,7 @@ import Layout from "@/components/Layout";
 import { useUploadDocuments, useUploadProfile } from "@/hooks/useUploadProfile";
 import { config } from "@/config/config";
 import { useCreateCreatorRequest } from "@/hooks/useCreator";
-import { toast } from 'sonner';
-
-
-
+import { toast } from "sonner";
 
 const TABS = [
   { key: "posts", label: "Posts", icon: User },
@@ -41,7 +38,7 @@ const TABS = [
 
 const ProfilePage = () => {
   const { profile, logout } = useAuth();
-  const [file, setFile] = useState<File[]| null>(null);
+  // const [file, setFile] = useState<File[]| null>(null);
   const [savedUrl, setSavedUrl] = useState<string[]>([]);
   const { mutate: updateProfile } = useUpdateProfile();
   const { mutate: uploadAvatar } = useUploadAvatar();
@@ -67,11 +64,13 @@ const ProfilePage = () => {
   const coverInputRef = useRef(null);
   const avatarInputRef = useRef(null);
   const [creatorForm, setCreatorForm] = useState({
-    reason: "",
-    contentFocus: "",
-    portfolio: "",
+    name: "",
+    photo: null as File | null,
     documents: [] as File[],
+    idProof: null as File | null,
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [idFile, setIdFile] = useState<File | null>(null);
   const [settings, setSettings] = useState({
     private: false,
     showActivity: true,
@@ -80,52 +79,72 @@ const ProfilePage = () => {
   });
 
   // creator section ------------------------
-  const { uploadDocuments, uploading, progress, error, documentUrls } =
-    useUploadDocuments({
-      storageZoneName: config.storageZoneName,
-      accessKey: config.accessKey,
-      pullZoneUrl: config.pullZoneUrl
+  const { uploadDocuments, uploading } = useUploadDocuments({
+    storageZoneName: config.storageZoneName,
+    accessKey: config.accessKey,
+    pullZoneUrl: config.pullZoneUrl,
   });
-
 
   const {
     submitRequest,
-    isLoading:   reqLoading,
-    error:       reqError,
-  } = useCreateCreatorRequest()
+    isLoading: reqLoading,
+    error: reqError,
+  } = useCreateCreatorRequest();
 
   async function handleCreatorSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
 
-    if (!file) return;
+    if (
+      !creatorForm.photo ||
+      !creatorForm.idProof ||
+      creatorForm.documents.length === 0
+    )
+      return;
     try {
-      await uploadDocuments(file);
+      const [photoUrl] = await uploadDocuments([creatorForm.photo]);
+      const docUrls = await uploadDocuments(creatorForm.documents);
+      const [idUrl] = await uploadDocuments([creatorForm.idProof]);
       await submitRequest({
-        reason:       creatorForm.reason,
-        contentFocus: creatorForm.contentFocus,
-        portfolio:    creatorForm.portfolio,
-        documents:    documentUrls,
-      })
+        name: creatorForm.name,
+        photo: photoUrl,
+        documents: docUrls,
+        idProof: idUrl,
+      });
       toast.success("Your creator request was submitted!");
-      setCreatorForm({ reason: '', contentFocus: '', portfolio: '', documents: [] })
-      setFile(null)
-      setShowCreator(false)
+      setCreatorForm({ name: "", photo: null, documents: [], idProof: null });
+      setPhotoFile(null);
+      setIdFile(null);
+      setShowCreator(false);
     } catch (err) {
       console.error(err);
-       toast.error(err.message || "Something went wrong.");
+      const message = err.response?.data?.message || err.message || 'Something went wrong.'
+      toast.error(message);
     }
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleDocumentsChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files) return;
     const newFiles = Array.from(files);
-    setFile(newFiles); // preserve single‐file if you need it
+    // setFile(newFiles); // preserve single‐file if you need it
     setCreatorForm((f) => ({
       ...f,
-      // append, avoid dupes if you like
       documents: [...f.documents, ...newFiles],
     }));
+  }
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setCreatorForm((f) => ({ ...f, photo: file }));
+  }
+
+  function handleIdChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIdFile(file);
+    setCreatorForm((f) => ({ ...f, idProof: file }));
   }
 
   function removeFile(idx: number) {
@@ -137,9 +156,9 @@ const ProfilePage = () => {
 
   // after your state hooks:
   const isFormValid =
-    creatorForm.reason.trim() !== "" &&
-    creatorForm.contentFocus.trim() !== "" &&
-    creatorForm.portfolio.trim() !== "" &&
+    creatorForm.name.trim() !== "" &&
+    creatorForm.photo !== null &&
+    creatorForm.idProof !== null &&
     creatorForm.documents.length > 0;
 
   // creator section ------------------------
@@ -610,52 +629,48 @@ const ProfilePage = () => {
                 Become a Creator
               </h2>
               <form className="space-y-4" onSubmit={handleCreatorSubmit}>
-                {/* Why */}
+                {/* Name */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Why do you want to become a creator?
-                  </label>
-                  <textarea
-                    name="reason"
-                    value={creatorForm.reason}
-                    onChange={handleCreatorChange}
-                    className="w-full rounded px-3 py-2 border border-border bg-background/80"
-                    rows={4}
-                  />
-                </div>
-
-                {/* Content Focus */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Content Focus
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Name</label>
                   <input
-                    name="contentFocus"
-                    value={creatorForm.contentFocus}
+                    name="name"
+                    value={creatorForm.name}
                     onChange={handleCreatorChange}
-                    placeholder="e.g., Videos, Vlogs, Reels"
+                    placeholder="Full Name"
                     className="w-full rounded px-3 py-2 border border-border bg-background/80"
                   />
                 </div>
 
-                {/* Portfolio / Links */}
+                {/* Photo Upload */}
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Portfolio / Links
+                    Photo Upload
                   </label>
-                  <input
-                    name="portfolio"
-                    value={creatorForm.portfolio}
-                    onChange={handleCreatorChange}
-                    placeholder="Your website, YouTube channel, etc."
-                    className="w-full rounded px-3 py-2 border border-border bg-background/80"
-                  />
+                  <label
+                    htmlFor="photo"
+                    className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg bg-background/80 cursor-pointer hover:border-primary transition-colors"
+                  >
+                    <UploadCloud className="w-8 h-8 text-primary mb-2" />
+                    <span className="text-sm text-muted-foreground">
+                      Click or drag photo here
+                    </span>
+                    <input
+                      id="photo"
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {photoFile && (
+                    <p className="text-sm mt-1 truncate">{photoFile.name}</p>
+                  )}
                 </div>
 
                 {/* Document Upload */}
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Upload Supporting Documents
+                    Documents Upload
                   </label>
                   <label
                     htmlFor="documents"
@@ -668,8 +683,9 @@ const ProfilePage = () => {
                     <input
                       id="documents"
                       type="file"
+                      accept="image/*,application/pdf,.doc,.docx"
                       multiple
-                      onChange={handleFileChange}
+                      onChange={handleDocumentsChange}
                       className="hidden"
                     />
                   </label>
@@ -689,6 +705,32 @@ const ProfilePage = () => {
                         </li>
                       ))}
                     </ul>
+                  )}
+                </div>
+
+                {/* ID Proof */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    ID Proof
+                  </label>
+                  <label
+                    htmlFor="idProof"
+                    className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg bg-background/80 cursor-pointer hover:border-primary transition-colors"
+                  >
+                    <UploadCloud className="w-8 h-8 text-primary mb-2" />
+                    <span className="text-sm text-muted-foreground">
+                      Upload ID proof
+                    </span>
+                    <input
+                      id="idProof"
+                      type="file"
+                      accept="image/*,application/pdf,.doc,.docx"
+                      onChange={handleIdChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {idFile && (
+                    <p className="text-sm mt-1 truncate">{idFile.name}</p>
                   )}
                 </div>
 

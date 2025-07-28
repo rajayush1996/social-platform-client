@@ -11,6 +11,7 @@ export const API_CONFIG = {
       RESET_PASSWORD: '/user/auth/reset-password',
       VERIFY_EMAIL: '/user/auth/verify-email',
       RESEND_VERIFICATION: '/user/auth/resend-verification',
+      VERIFY_RESET_TOKEN: '/user/auth/verify-reset-token'
     },
     // User
     USER: {

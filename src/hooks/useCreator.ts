@@ -1,14 +1,13 @@
-// src/hooks/api/useCreatorRequests.ts
 import { API_CONFIG } from '@/config/api.config'
 import axiosInstance from '@/lib/axios'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 
 export interface CreatorRequestPayload {
-  reason:       string
-  contentFocus: string
-  portfolio:    string
   documents:    string[]   // CDN URLs from your Bunny uploads
+  name:      string
+  photo:     string
+  idProof:   string
 }
 
 export interface CreatorRequestResponse {

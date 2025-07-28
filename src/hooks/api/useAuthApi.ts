@@ -1,4 +1,5 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useMutation, UseMutationOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '@/lib/axios';
 import { API_CONFIG } from '@/config/api.config';
 
@@ -135,21 +136,53 @@ export const useForgotPassword = () => {
   });
 };
 
-
-
-interface ResetPasswordResponse {
+// Define the types for the response and error
+type ResetPasswordResponse = {
+  data: any;
   success: boolean;
-}
-
-interface ResetPasswordError {
   message: string;
-}
+};
+
+type ResetPasswordError = {
+  message: string;
+  statusCode: number;
+};
 
 export const useResetPassword = () => {
-  return useMutation<ResetPasswordResponse, ResetPasswordError, string>({
-    mutationFn: async (password: string) => {
-      const { data } = await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.RESET_PASSWORD, { password });
+  return useMutation<ResetPasswordResponse, ResetPasswordError, { newPassword: string, confirmPassword: string }>({
+    mutationFn: async ({ newPassword, confirmPassword }) => {
+      // Check if the passwords match
+      if (newPassword !== confirmPassword) {
+        throw new Error('Passwords do not match!');
+      }
+
+      const { data } = await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.RESET_PASSWORD, {
+        newPassword,
+        confirmPassword
+      });
       return data;
     },
+  });
+};
+
+
+type VerifyResetTokenResponse = {
+  message: string;
+  email: string;
+};
+
+type VerifyResetTokenError = {
+  message: string;
+  statusCode: number;
+};
+
+export const useVerifyResetToken = (token: string) => {
+  return useQuery<VerifyResetTokenResponse, VerifyResetTokenError>({
+    queryKey: ['verify-reset-token', token],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<VerifyResetTokenResponse>(`${API_CONFIG.ENDPOINTS.AUTH.VERIFY_RESET_TOKEN}?token=${token}`);
+      return data;
+    },
+    enabled: !!token, // Only run the query if the token is available
   });
 };

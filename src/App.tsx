@@ -21,6 +21,7 @@ import ActivateAccountPage from "./pages/ActivateAccountPage";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ReelsPage from "./pages/ReelsPage";
 import CheckEmailPage from "./pages/CheckEmail";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -39,7 +40,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/activate-account" element={<ActivateAccountPage />} />
               <Route path="/check-email" element={<CheckEmailPage />} />
-              
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
               {/* Protected Routes */}
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />

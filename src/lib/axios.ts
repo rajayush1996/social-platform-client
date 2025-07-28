@@ -34,7 +34,21 @@ axiosInstance.interceptors.request.use(
 
 // Response interceptor for handling errors and refreshing token if expired
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const data = response.data
+    if (
+      data &&
+      typeof data === 'object' &&
+      ((Object.prototype.hasOwnProperty.call(data, 'success') && data.success === false) ||
+        (Object.prototype.hasOwnProperty.call(data, 'status') && data.status !== 'success'))
+    ) {
+      return Promise.reject({
+        message: data.message || 'Request failed',
+        response,
+      })
+    }
+    return response
+  },
   async (error) => {
     const originalRequest = error.config;
 
