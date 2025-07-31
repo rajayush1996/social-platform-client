@@ -149,8 +149,8 @@ type ResetPasswordError = {
 };
 
 export const useResetPassword = () => {
-  return useMutation<ResetPasswordResponse, ResetPasswordError, { newPassword: string, confirmPassword: string }>({
-    mutationFn: async ({ newPassword, confirmPassword }) => {
+  return useMutation<ResetPasswordResponse, ResetPasswordError, { newPassword: string, confirmPassword: string, token: string }>({
+    mutationFn: async ({ newPassword, confirmPassword, token }) => {
       // Check if the passwords match
       if (newPassword !== confirmPassword) {
         throw new Error('Passwords do not match!');
@@ -158,7 +158,8 @@ export const useResetPassword = () => {
 
       const { data } = await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.RESET_PASSWORD, {
         newPassword,
-        confirmPassword
+        confirmPassword,
+        token
       });
       return data;
     },

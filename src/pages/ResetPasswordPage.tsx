@@ -46,7 +46,7 @@ const ResetPasswordPage = () => {
 
     try {
       // Call the reset password mutation with the new password and confirm password
-      const response = await mutateAsync({ newPassword, confirmPassword });
+      const response = await mutateAsync({ newPassword, confirmPassword, token });
 
       // Check if the reset was successful and show success message
       if (response?.success) {

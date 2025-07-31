@@ -57,7 +57,6 @@ export default function VideoDetail() {
     selectedMediaId: id,
     recommend: true,
   });
-  console.log("🚀 ~ :42 ~ VideoDetail ~ recsData:", recsData);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
