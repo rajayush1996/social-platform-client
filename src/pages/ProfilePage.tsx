@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,7 @@ import {
   Upload,
   X,
   UploadCloud,
+  PlusCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -26,6 +28,11 @@ import Layout from "@/components/Layout";
 import { useUploadDocuments, useUploadProfile } from "@/hooks/useUploadProfile";
 import { config } from "@/config/config";
 import { useCreateCreatorRequest } from "@/hooks/useCreator";
+import { useCreatorMediaList, useCreateMedia } from "@/hooks/useCreatorMedia";
+import { useBunnyStreamUpload } from "@/hooks/useStreamUpload";
+import { useCategories } from "@/hooks/useCategories";
+import VideoCard from "@/components/videos/VideoCard";
+import ReelCard from "@/components/reels/ReelCard";
 import { toast } from "sonner";
 
 const TABS = [
@@ -78,6 +85,32 @@ const ProfilePage = () => {
     pushNotif: profile?.profile.preferences.notifications.push || false,
   });
 
+  const { data: videosData, isLoading: videosLoading } = useCreatorMediaList({
+    type: "video",
+  });
+  const { data: reelsData, isLoading: reelsLoading } = useCreatorMediaList({
+    type: "reel",
+  });
+  const { mutate: createMedia, isPending: creatingMedia } = useCreateMedia();
+  const {
+    uploadVideo: uploadStreamVideo,
+    uploading: uploadingMedia,
+    progress: streamProgress,
+  } = useBunnyStreamUpload({
+    libraryId: config.streamLibraryId,
+    apiKey: config.streamApiKey,
+  });
+  const { data: categoriesData } = useCategories();
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploadType, setUploadType] = useState<"video" | "reel">("video");
+  const [mediaForm, setMediaForm] = useState({
+    title: "",
+    description: "",
+    tags: [],
+    category: "",
+    file: null as File | null,
+  });
+
   // creator section ------------------------
   const { uploadDocuments, uploading } = useUploadDocuments({
     storageZoneName: config.storageZoneName,
@@ -117,7 +150,8 @@ const ProfilePage = () => {
       setShowCreator(false);
     } catch (err) {
       console.error(err);
-      const message = err.response?.data?.message || err.message || 'Something went wrong.'
+      const message =
+        err.response?.data?.message || err.message || "Something went wrong.";
       toast.error(message);
     }
   }
@@ -152,6 +186,62 @@ const ProfilePage = () => {
       ...f,
       documents: f.documents.filter((_, i) => i !== idx),
     }));
+  }
+
+  function handleMediaChange(
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) {
+    const { name, value } = e.target;
+    setMediaForm((f) => ({ ...f, [name]: value }));
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] || null;
+    setMediaForm((f) => ({ ...f, file }));
+  }
+
+  async function handleMediaSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!mediaForm.file) return;
+    try {
+      const mediaFileId = await uploadStreamVideo(mediaForm.file);
+      createMedia(
+        {
+          mediaFileId,
+          title: mediaForm.title,
+          description: mediaForm.description,
+          tags: mediaForm.tags,
+          category: mediaForm.category,
+          mediaType: uploadType,
+        },
+        {
+          onSuccess: () => {
+            toast.success(
+              `${uploadType === "video" ? "Video" : "Reel"} uploaded`
+            );
+            setMediaForm({
+              title: "",
+              description: "",
+              tags: [],
+              category: "",
+              file: null,
+            });
+            setShowUpload(false);
+          },
+          onError: (err: any) => {
+            const message =
+              err.response?.data?.message || err.message || "Upload failed";
+            toast.error(message);
+          },
+        }
+      );
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message || err.message || "Upload failed";
+      toast.error(message);
+    }
   }
 
   // after your state hooks:
@@ -209,6 +299,27 @@ const ProfilePage = () => {
   if (!profile) {
     return <div>Loading...</div>;
   }
+
+  const handleTagKeyDown = (e) => {
+    const value = e.target.value.trim();
+    if ((e.key === "Enter" || e.key === ",") && value) {
+      e.preventDefault();
+      if (!mediaForm.tags.includes(value)) {
+        setMediaForm((prev) => ({
+          ...prev,
+          tags: [...prev.tags, value],
+        }));
+      }
+      e.target.value = "";
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setMediaForm((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+    }));
+  };
 
   return (
     <Layout>
@@ -324,14 +435,68 @@ const ProfilePage = () => {
             </div>
           )}
           {activeTab === "videos" && (
-            <div className="text-center text-base sm:text-lg text-muted-foreground">
-              No videos uploaded yet.
-            </div>
+            <>
+              {profile.user.role === "CREATOR" && (
+                <div className="flex justify-end mb-4">
+                  <Button
+                    size="icon"
+                    onClick={() => {
+                      setUploadType("video");
+                      setShowUpload(true);
+                    }}
+                  >
+                    <PlusCircle className="h-5 w-5" />
+                  </Button>
+                </div>
+              )}
+              {videosLoading ? (
+                <div className="text-center text-base sm:text-lg text-muted-foreground">
+                  Loading...
+                </div>
+              ) : videosData?.results && videosData.results.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {videosData.results.map((v) => (
+                    <VideoCard key={v.id || v._id} v={v} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-base sm:text-lg text-muted-foreground">
+                  No videos uploaded yet.
+                </div>
+              )}
+            </>
           )}
           {activeTab === "reels" && (
-            <div className="text-center text-base sm:text-lg text-muted-foreground">
-              No reels yet.
-            </div>
+            <>
+              {profile.user.role === "CREATOR" && (
+                <div className="flex justify-end mb-4">
+                  <Button
+                    size="icon"
+                    onClick={() => {
+                      setUploadType("reel");
+                      setShowUpload(true);
+                    }}
+                  >
+                    <PlusCircle className="h-5 w-5" />
+                  </Button>
+                </div>
+              )}
+              {reelsLoading ? (
+                <div className="text-center text-base sm:text-lg text-muted-foreground">
+                  Loading...
+                </div>
+              ) : reelsData?.results && reelsData.results.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {reelsData.results.map((r) => (
+                    <ReelCard key={r.id || r._id} reel={r} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-base sm:text-lg text-muted-foreground">
+                  No reels yet.
+                </div>
+              )}
+            </>
           )}
           {activeTab === "history" && (
             <div className="text-center text-base sm:text-lg text-muted-foreground">
@@ -741,6 +906,153 @@ const ProfilePage = () => {
                 >
                   Submit Application
                 </Button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Upload Media Modal */}
+        {showUpload && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2">
+            <div className="bg-background rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-md relative">
+              <button
+                className="absolute top-4 right-4 text-xl"
+                onClick={() => setShowUpload(false)}
+              >
+                &times;
+              </button>
+              <h2 className="text-lg font-bold mb-4">
+                Upload {uploadType === "video" ? "Video" : "Reel"}
+              </h2>
+              <form onSubmit={handleMediaSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Title
+                  </label>
+                  <input
+                    name="title"
+                    value={mediaForm.title}
+                    onChange={handleMediaChange}
+                    className="w-full rounded px-3 py-2 border border-border bg-background/80"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    value={mediaForm.description}
+                    onChange={handleMediaChange}
+                    className="w-full rounded px-3 py-2 border border-border bg-background/80"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tags</label>
+                  <div className="w-full min-h-[44px] border border-border bg-background/80 rounded px-2 py-2 flex flex-wrap items-center gap-2">
+                    {mediaForm.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="flex items-center gap-1 px-2 py-1 text-sm rounded-full bg-violet-600 text-white"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="text-white hover:text-gray-200"
+                        >
+                          &times;
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      onKeyDown={handleTagKeyDown}
+                      placeholder="Press Enter to add"
+                      className="flex-1 min-w-[120px] bg-transparent focus:outline-none text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Category
+                  </label>
+                  <select
+                    name="category"
+                    value={mediaForm.category}
+                    onChange={handleMediaChange}
+                    className="w-full rounded px-3 py-2 border border-border bg-background/80"
+                  >
+                    <option value="">Select</option>
+                    {categoriesData?.results.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">File</label>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleFileChange}
+                    className="block w-full text-sm text-gray-400 
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:text-sm file:font-semibold
+              file:bg-violet-600 file:text-white
+              hover:file:bg-violet-700
+              dark:file:bg-violet-500 dark:hover:file:bg-violet-600"
+                  />
+                  {mediaForm.file && (
+                    <div className="mt-2 text-sm text-muted-foreground">
+                      <p>
+                        <strong>Name:</strong> {mediaForm.file.name}
+                      </p>
+                      <p>
+                        <strong>Type:</strong> {mediaForm.file.type}
+                      </p>
+                      <p>
+                        <strong>Size:</strong>{" "}
+                        {(mediaForm.file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload Progress Bar */}
+                {uploadingMedia && (
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+                    <div
+                      className="bg-violet-600 h-2.5 rounded-full transition-all duration-300"
+                      style={{ width: `${streamProgress}%` }}
+                    />
+                    <p className="text-xs mt-1 text-center text-muted-foreground">
+                      Uploading... {streamProgress.toFixed(0)}%
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowUpload(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1"
+                    disabled={creatingMedia || uploadingMedia}
+                  >
+                    {creatingMedia || uploadingMedia
+                      ? "Uploading..."
+                      : "Upload"}
+                  </Button>
+                </div>
               </form>
             </div>
           </div>

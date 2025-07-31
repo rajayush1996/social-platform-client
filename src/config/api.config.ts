@@ -55,13 +55,14 @@ export const API_CONFIG = {
       STATS: '/creator/stats',
       ANALYTICS: '/creator/analytics',
       UPDATE_PROFILE: '/creator/profile',
-      MEDIA_LIST: '/creator/media',
+      MEDIA_LIST: '/creator/media-metadata',
       BLOG_LIST: '/creator/blogs',
     },
     // Media
     MEDIA: {
       LIST: '/media',
       DETAIL: (id: string) => `/media/${id}`,
+      METADATA: '/user/media-metadata',
       INCREMENT_VIEW: (id: string) => `/media/${id}/view`,
       LIKE: (id: string) => `/media/${id}/like`,
       UNLIKE: (id: string) => `/media/${id}/unlike`,
