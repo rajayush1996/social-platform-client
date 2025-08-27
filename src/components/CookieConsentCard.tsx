@@ -1,4 +1,6 @@
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Cookie } from 'lucide-react';
@@ -17,6 +19,10 @@ export default function CookieConsentCard({
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md border-none p-0 bg-transparent">
+        <VisuallyHidden>
+          <DialogTitle>Cookie consent</DialogTitle>
+        </VisuallyHidden>
+
         <Card className="bg-pink-50 border-pink-200">
           <CardContent className="p-4 flex items-start gap-3">
             <Cookie className="h-5 w-5 text-pink-600 mt-1" />
