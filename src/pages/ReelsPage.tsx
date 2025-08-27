@@ -7,7 +7,7 @@ import Layout from "@/components/Layout";
 import ReelsNavigation from "@/components/ReelsNavigation";
 import { useReelsInfinite } from "@/hooks/useReel";
 import { ReelCard } from "@/components/reels/ReelCard2";
-import { BounceLoader } from "react-spinners";
+import Loader from "@/components/Loader";
 
 export default function ReelsPage() {
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -67,9 +67,7 @@ export default function ReelsPage() {
   if (isLoading) {
     return (
       <Layout hideFooter>
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <BounceLoader loading color="#ec4899" size={100}/>
-        </div>
+        <Loader fullScreen size={100} />
       </Layout>
     );
   }

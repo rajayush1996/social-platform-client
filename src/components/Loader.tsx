@@ -1,5 +1,5 @@
 import React from 'react';
-import { BounceLoader } from 'react-spinners';
+import { ClipLoader } from 'react-spinners';
 
 interface LoaderProps {
   fullScreen?: boolean;
@@ -12,7 +12,7 @@ export default function Loader({ fullScreen = false, size = 80 }: LoaderProps) {
     : 'flex items-center justify-center';
   return (
     <div className={classes}>
-      <BounceLoader loading color="#ec4899" size={size} />
+      <ClipLoader color="#ec4899" size={size} />
     </div>
   );
 }

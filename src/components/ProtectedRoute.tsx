@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import Loader from '@/components/Loader';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,7 +11,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const location = useLocation();
 
   if (isLoading) {
-    return <div>Loading...</div>; // You can replace this with a proper loading component
+    return <Loader fullScreen />;
   }
 
   // List of public routes that don't require authentication

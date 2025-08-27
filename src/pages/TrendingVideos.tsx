@@ -1,6 +1,6 @@
 // components/TrendingVideos.tsx
 import { useState } from "react";
-import { BounceLoader } from "react-spinners";
+import Loader from "@/components/Loader";
 import { usePaginatedContent } from "@/hooks/useHome";
 import VideoCard from "@/components/videos/VideoCard";
 import { Video } from "@/types/api.types";
@@ -31,7 +31,7 @@ export default function TrendingVideos({
   if (isLoading) {
     return (
       <div className="py-12 flex justify-center">
-        <BounceLoader size={50} color="#ec4899" />
+        <Loader size={50} />
       </div>
     );
   }
