@@ -1,5 +1,7 @@
+
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+
 import {
   Card,
   CardHeader,
@@ -22,6 +24,7 @@ export default function AgeConsentCard({ open, onConfirm }: AgeConsentCardProps)
         <VisuallyHidden>
           <DialogTitle>Age verification</DialogTitle>
         </VisuallyHidden>
+
         <Card className="bg-gradient-to-b from-pink-50 to-white border-pink-200">
           <CardHeader className="text-center space-y-2">
             <ShieldAlert className="mx-auto h-10 w-10 text-pink-600" />

@@ -99,6 +99,7 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
         <main className="flex-grow" style={{ paddingTop: `var(--header-height)` }}>
           {children}
         </main>
+        {showCookieConsent && <CookieConsentCard onAccept={handleCookieAccept} />}
 
         {!hideFooter && <Footer />}
       </div>
