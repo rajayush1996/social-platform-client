@@ -24,20 +24,17 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
   const isReels = location.pathname === '/reels';
 
   useEffect(() => {
-    setBannerVisible(!isAuthenticated);
-
-    if (isAuthenticated) {
-      const ageDone = localStorage.getItem('ageConsented');
-      const cookieDone = localStorage.getItem('cookiesAccepted');
-      if (!ageDone) {
-        setShowAgeConsent(true);
-      } else if (!cookieDone) {
-        setShowCookieConsent(true);
-      }
-    } else {
-      setShowAgeConsent(false);
-      setShowCookieConsent(false);
+    const ageDone = localStorage.getItem('ageConsented');
+    const cookieDone = localStorage.getItem('cookiesAccepted');
+    if (!ageDone) {
+      setShowAgeConsent(true);
+    } else if (!cookieDone) {
+      setShowCookieConsent(true);
     }
+  }, []);
+
+  useEffect(() => {
+    setBannerVisible(!isAuthenticated);
   }, [isAuthenticated]);
 
   useEffect(() => {
