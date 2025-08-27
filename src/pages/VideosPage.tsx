@@ -9,7 +9,6 @@ import CategoryNav from "@/components/CategoryNav";
 
 const VideosPage = () => {
   const [page, setPage] = useState(1);
-  const limit = 16;
   const [searchParams] = useSearchParams();
   const catId = searchParams.get("category") || "all";
   const searchByName = searchParams.get("q") || '';
@@ -20,7 +19,7 @@ const VideosPage = () => {
   // Pass page and limit to fetch paginated videos
   const { data, isLoading, isError } = useVideos({
     page,
-    limit,
+    limit: 16,
     categoryId: category,
     search: searchByName,
   });
@@ -66,6 +65,31 @@ const VideosPage = () => {
   const handleNext = () =>
     setPage((p) => Math.min(pagination.totalPages, p + 1));
 
+  const getPageNumbers = (total: number) => {
+    const pages: (number | string)[] = [];
+    const firstBlockEnd = Math.min(6, total);
+    for (let i = 1; i <= firstBlockEnd; i++) pages.push(i);
+    if (total > firstBlockEnd) {
+      const checkpoints = [
+        Math.floor(total / 2),
+        Math.floor((total * 2) / 3),
+        total - 2,
+        total,
+      ];
+      let last = firstBlockEnd;
+      checkpoints.forEach((cp) => {
+        if (cp > last && cp <= total) {
+          if (cp - last > 1) pages.push("...");
+          pages.push(cp);
+          last = cp;
+        }
+      });
+    }
+    return pages;
+  };
+
+  const pageNumbers = getPageNumbers(pagination.totalPages);
+
   return (
     <Layout>
       <CategoryNav activeCategory={category} onCategoryChange={setCategory} />
@@ -99,8 +123,8 @@ const VideosPage = () => {
             >
               Previous
             </Button>
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(
-              (num) => (
+            {pageNumbers.map((num, idx) =>
+              typeof num === "number" ? (
                 <button
                   key={num}
                   onClick={() => setPage(num)}
@@ -112,6 +136,10 @@ const VideosPage = () => {
                 >
                   {num}
                 </button>
+              ) : (
+                <span key={`ellipsis-${idx}`} className="px-2">
+                  {num}
+                </span>
               )
             )}
             <Button
