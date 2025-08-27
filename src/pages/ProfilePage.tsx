@@ -842,6 +842,9 @@ const ProfilePage = () => {
                   <label className="block text-sm font-medium mb-1">
                     Documents Upload
                   </label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Please upload clear documents with your face.
+                  </p>
                   <label
                     htmlFor="documents"
                     className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg bg-background/80 cursor-pointer hover:border-primary transition-colors"
@@ -883,6 +886,9 @@ const ProfilePage = () => {
                   <label className="block text-sm font-medium mb-1">
                     ID Proof
                   </label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Upload a clear ID proof where all details are readable.
+                  </p>
                   <label
                     htmlFor="idProof"
                     className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg bg-background/80 cursor-pointer hover:border-primary transition-colors"

@@ -4,10 +4,11 @@ import Loader from "@/components/Loader";
 import { usePaginatedContent } from "@/hooks/useHome";
 import VideoCard from "@/components/videos/VideoCard";
 import { Video } from "@/types/api.types";
+import { Button } from "@/components/ui/button";
 
 export default function TrendingVideos({
   category,
-  initialLimit = 12,
+  initialLimit = 16,
 }: {
   category: string;
   initialLimit?: number;
@@ -18,7 +19,6 @@ export default function TrendingVideos({
     items: videos,
     isLoading,
     isError,
-    currentPage,
     totalPages,
   } = usePaginatedContent<Video>({
     page,
@@ -46,7 +46,41 @@ export default function TrendingVideos({
     return null;
   }
 
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const handlePrev = () => setPage((p) => Math.max(1, p - 1));
+  const handleNext = () => setPage((p) => Math.min(totalPages, p + 1));
+
+  const getPageNumbers = (total: number) => {
+    const pages: (number | string)[] = [];
+    const firstBlockEnd = Math.min(6, total);
+
+    for (let i = 1; i <= firstBlockEnd; i++) {
+      pages.push(i);
+    }
+
+    if (total > firstBlockEnd) {
+      const mid = Math.ceil(total / 2);
+
+      if (mid - firstBlockEnd > 1) {
+        pages.push("...");
+      }
+
+      if (mid > firstBlockEnd && mid < total) {
+        pages.push(mid);
+      }
+
+      if (total - mid > 1) {
+        pages.push("...");
+      }
+
+      if (mid !== total) {
+        pages.push(total);
+      }
+    }
+
+    return pages;
+  };
+
+  const pageNumbers = getPageNumbers(totalPages);
 
   return (
     <section className="mt-12 mb-12">
@@ -69,38 +103,40 @@ export default function TrendingVideos({
           ))}
         </div>
 
-        {/* classic pagination below */}
         {totalPages > 1 && (
           <nav className="flex items-center justify-center mt-8 space-x-2">
-            <button
-              onClick={() => setPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
-            >
-              Prev
-            </button>
-
-            {pages.map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`px-3 py-1 rounded transition ${
-                  p === currentPage
-                    ? "bg-pink-500 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-
-            <button
-              onClick={() => setPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+            <Button onClick={handlePrev} disabled={page === 1} variant="outline">
+              Previous
+            </Button>
+            {pageNumbers.map((num, idx) =>
+              typeof num === "number" ? (
+                <button
+                  key={num}
+                  onClick={() => setPage(num)}
+                  className={`w-8 h-8 flex items-center justify-center rounded ${
+                    page === num
+                      ? "bg-white text-black"
+                      : "bg-gray-800 text-gray-200"
+                  }`}
+                >
+                  {num}
+                </button>
+              ) : (
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="px-2 text-gray-400"
+                >
+                  {num}
+                </span>
+              )
+            )}
+            <Button
+              onClick={handleNext}
+              disabled={page === totalPages}
+              variant="outline"
             >
               Next
-            </button>
+            </Button>
           </nav>
         )}
       </div>

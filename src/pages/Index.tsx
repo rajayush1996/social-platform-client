@@ -62,11 +62,6 @@ import TrendingVideos from "./TrendingVideos";
 
 export default function Index() {
   const [category, setCategory] = useState("all");
-  const latestLimit = 12;
- 
-  // classic pagination for trendingVideos
-  // const [trPage, setTrPage] = useState(1);
-  const [trLimit, setTrLimit] = useState(12);
 
   
   return (
@@ -89,48 +84,7 @@ export default function Index() {
 
         {/* <FeaturedBlogs blogs={homePages.pages[0].trendingBlogs.results} /> */}
 
-        <section className="container flex items-center gap-4 mb-4">
-          <label
-            htmlFor="trending-limit"
-            className="text-sm font-medium text-white"
-          >
-            Per‑page:
-          </label>
-
-          <div className="relative inline-block">
-            <select
-              id="trending-limit"
-              value={trLimit}
-              onChange={(e) => setTrLimit(+e.target.value)}
-              className="
-                  block
-                  w-20
-                  bg-gray-800
-                  text-white
-                  border border-gray-700
-                  rounded-md
-                  px-2 py-1
-                  focus:outline-none focus:ring-2 focus:ring-pink-500
-                  appearance-none
-                "
-            >
-              {[6, 12, 24, 48].map((n) => (
-                <option key={n} value={n} className="bg-gray-800 text-white">
-                  {n}
-                </option>
-              ))}
-            </select>
-            {/* little custom arrow so you don’t get the native one */}
-            <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-400">
-              ▾
-            </span>
-          </div>
-        </section>
-
-        <TrendingVideos
-            category={category}
-            initialLimit={trLimit}
-          />
+        <TrendingVideos category={category} />
 {/* 
         {trLoading ? (
           <div className="flex justify-center space-x-2 py-8">

@@ -9,7 +9,6 @@ import CategoryNav from "@/components/CategoryNav";
 
 const VideosPage = () => {
   const [page, setPage] = useState(1);
-  const limit = 16;
   const [searchParams] = useSearchParams();
   const catId = searchParams.get("category") || "all";
   const searchByName = searchParams.get("q") || '';
@@ -20,7 +19,7 @@ const VideosPage = () => {
   // Pass page and limit to fetch paginated videos
   const { data, isLoading, isError } = useVideos({
     page,
-    limit,
+    limit: 16,
     categoryId: category,
     search: searchByName,
   });
@@ -66,6 +65,39 @@ const VideosPage = () => {
   const handleNext = () =>
     setPage((p) => Math.min(pagination.totalPages, p + 1));
 
+  const getPageNumbers = (total: number) => {
+    const pages: (number | string)[] = [];
+    const firstBlockEnd = Math.min(6, total);
+
+    for (let i = 1; i <= firstBlockEnd; i++) {
+      pages.push(i);
+    }
+
+    if (total > firstBlockEnd) {
+      const mid = Math.ceil(total / 2);
+
+      if (mid - firstBlockEnd > 1) {
+        pages.push("...");
+      }
+
+      if (mid > firstBlockEnd && mid < total) {
+        pages.push(mid);
+      }
+
+      if (total - mid > 1) {
+        pages.push("...");
+      }
+
+      if (mid !== total) {
+        pages.push(total);
+      }
+    }
+
+    return pages;
+  };
+
+  const pageNumbers = getPageNumbers(pagination.totalPages);
+
   return (
     <Layout>
       <CategoryNav activeCategory={category} onCategoryChange={setCategory} />
@@ -99,19 +131,26 @@ const VideosPage = () => {
             >
               Previous
             </Button>
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(
-              (num) => (
+            {pageNumbers.map((num, idx) =>
+              typeof num === "number" ? (
                 <button
                   key={num}
                   onClick={() => setPage(num)}
-                  className={`px-3 py-1 rounded ${
+                  className={`w-8 h-8 flex items-center justify-center rounded ${
                     page === num
-                      ? "bg-pink-500 text-white"
-                      : "bg-gray-200 text-gray-700"
+                      ? "bg-white text-black"
+                      : "bg-gray-800 text-gray-200"
                   }`}
                 >
                   {num}
                 </button>
+              ) : (
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="px-2 text-gray-400"
+                >
+                  {num}
+                </span>
               )
             )}
             <Button
