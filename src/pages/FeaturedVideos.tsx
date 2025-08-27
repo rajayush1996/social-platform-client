@@ -47,12 +47,6 @@ export default function FeaturedVideos({
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">Mostly Viewed</h2>
-          <button
-            onClick={() => (window.location.href = "/videos")}
-            className="text-pink-500 hover:underline text-sm"
-          >
-            View All
-          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -62,6 +56,15 @@ export default function FeaturedVideos({
               v = {video}
             />
           ))}
+        </div>
+
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={() => (window.location.href = "/videos")}
+            className="px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition"
+          >
+            View All
+          </button>
         </div>
       </div>
     </section>
