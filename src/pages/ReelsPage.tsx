@@ -1,6 +1,7 @@
 // pages/ReelsPage.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ReelsNavigation from "@/components/ReelsNavigation";
 import { useReelsInfinite } from "@/hooks/useReel";
@@ -9,6 +10,9 @@ import { BounceLoader } from "react-spinners";
 
 export default function ReelsPage() {
   const loaderRef = useRef<HTMLDivElement>(null);
+  const [searchParams] = useSearchParams();
+  const startId = searchParams.get("reelId");
+
   const {
     data, isLoading, isError,
     fetchNextPage, hasNextPage, isFetchingNextPage,
@@ -30,6 +34,17 @@ export default function ReelsPage() {
     obs.observe(node);
     return () => obs.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  // When arriving with a reelId, load pages until it's found then scroll to it
+  useEffect(() => {
+    if (!startId) return;
+    const el = document.getElementById(`reel-${startId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "auto", block: "start" });
+    } else if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [startId, data, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (
@@ -62,7 +77,7 @@ export default function ReelsPage() {
         style={{ top: 'var(--header-height)' }}
       >
         {reels.map((r: any) => (
-          <div key={r._id} className="snap-start h-full flex justify-center">
+          <div id={`reel-${r._id}`} key={r._id} className="snap-start h-full flex justify-center">
             <div className="w-full max-w-md h-full">
               <ReelCard reel={r}/>
             </div>
