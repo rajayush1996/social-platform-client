@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ShieldAlert } from 'lucide-react';
 
+
 interface AgeConsentCardProps {
   open: boolean;
   onConfirm: () => void;
