@@ -91,7 +91,6 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
         </main>
 
         {showCookieConsent && <CookieConsentCard onAccept={handleCookieAccept} />}
-
         {!hideFooter && <Footer />}
       </div>
     </>
