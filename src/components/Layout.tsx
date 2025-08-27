@@ -1,9 +1,9 @@
- 
-// components/Layout.tsx
 import { ReactNode, useState, useRef, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EarnBanner from './EarnBanner';
+import AgeConsentCard from './AgeConsentCard';
+import CookieConsentCard from './CookieConsentCard';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -15,6 +15,8 @@ interface LayoutProps {
 const Layout = ({ children, hideFooter = false }: LayoutProps) => {
   const { isAuthenticated } = useAuth();
   const [bannerVisible, setBannerVisible] = useState(!isAuthenticated);
+  const [showAgeConsent, setShowAgeConsent] = useState(false);
+  const [showCookieConsent, setShowCookieConsent] = useState(false);
   const bannerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -22,8 +24,19 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
   const isReels = location.pathname === '/reels';
 
   useEffect(() => {
+    setBannerVisible(!isAuthenticated);
+
     if (isAuthenticated) {
-      setBannerVisible(false);
+      const ageDone = localStorage.getItem('ageConsented');
+      const cookieDone = localStorage.getItem('cookiesAccepted');
+      if (!ageDone) {
+        setShowAgeConsent(true);
+      } else if (!cookieDone) {
+        setShowCookieConsent(true);
+      }
+    } else {
+      setShowAgeConsent(false);
+      setShowCookieConsent(false);
     }
   }, [isAuthenticated]);
 
@@ -43,29 +56,47 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
     return () => window.removeEventListener('resize', measure);
   }, [bannerVisible, isAuthenticated]);
 
+  const handleAgeConfirm = () => {
+    localStorage.setItem('ageConsented', 'true');
+    setShowAgeConsent(false);
+    if (!localStorage.getItem('cookiesAccepted')) {
+      setShowCookieConsent(true);
+    }
+  };
+
+  const handleCookieAccept = () => {
+    localStorage.setItem('cookiesAccepted', 'true');
+    setShowCookieConsent(false);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-background"
-          style={
-        isReels
-          ? { '--header-height': `${headerHeight}px` } as React.CSSProperties
-          : {}
-      }>
-      <div ref={bannerRef}>
-        {!isAuthenticated && bannerVisible && (
-          <EarnBanner onClose={() => setBannerVisible(false)} />
-        )}
-      </div>
-      <div ref={navRef}>
-        <Navbar />
-      </div>
+    <>
+      <AgeConsentCard open={showAgeConsent} onConfirm={handleAgeConfirm} />
+      <CookieConsentCard open={showCookieConsent} onAccept={handleCookieAccept} />
+      <div
+        className="min-h-screen flex flex-col bg-background"
+        style={
+          isReels
+            ? ({ '--header-height': `${headerHeight}px` } as React.CSSProperties)
+            : {}
+        }
+      >
+        <div ref={bannerRef}>
+          {!isAuthenticated && bannerVisible && (
+            <EarnBanner onClose={() => setBannerVisible(false)} />
+          )}
+        </div>
+        <div ref={navRef}>
+          <Navbar />
+        </div>
 
-      <main className="flex-grow"
-            style={{ paddingTop: `var(--header-height)` }}>
-        {children}
-      </main>
+        <main className="flex-grow" style={{ paddingTop: `var(--header-height)` }}>
+          {children}
+        </main>
 
-      {!hideFooter && <Footer />}
-    </div>
+        {!hideFooter && <Footer />}
+      </div>
+    </>
   );
 };
 
