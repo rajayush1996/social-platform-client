@@ -66,9 +66,19 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
     setShowCookieConsent(false);
   };
 
+  const handleCookieDecline = () => {
+    localStorage.setItem('cookiesAccepted', 'false');
+    setShowCookieConsent(false);
+  };
+
   return (
     <>
       <AgeConsentCard open={showAgeConsent} onConfirm={handleAgeConfirm} />
+      <CookieConsentCard
+        open={showCookieConsent}
+        onAccept={handleCookieAccept}
+        onDecline={handleCookieDecline}
+      />
       <div
         className="min-h-screen flex flex-col bg-background"
         style={
