@@ -72,7 +72,6 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
   return (
     <>
       <AgeConsentCard open={showAgeConsent} onConfirm={handleAgeConfirm} />
-      <CookieConsentCard open={showCookieConsent} onAccept={handleCookieAccept} />
       <div
         className="min-h-screen flex flex-col bg-background"
         style={
@@ -94,6 +93,7 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
           {children}
         </main>
 
+        {showCookieConsent && <CookieConsentCard onAccept={handleCookieAccept} />}
         {!hideFooter && <Footer />}
       </div>
     </>
