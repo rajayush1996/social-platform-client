@@ -1,6 +1,7 @@
 import { createContext, useState, ReactNode, useEffect } from 'react';
 import { useProfile } from '@/hooks/api/useProfileApi';
 import type { ProfileResponse } from '@/types/profile';
+import Loader from '@/components/Loader';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   if (isLoading || (token && isProfileLoading)) {
-    return <div>Loading...</div>; // You can replace this with a proper loading component
+    return <Loader fullScreen />;
   }
 
   return (

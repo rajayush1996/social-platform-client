@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { BounceLoader } from "react-spinners";
+import Loader from "@/components/Loader";
 import { usePaginatedContent } from "@/hooks/useHome";
 import ReelCard from "@/components/reels/ReelCard";
 // import { YourReelType } from "@/types/api";
@@ -39,7 +39,7 @@ export default function TrendingReels({
   if (isLoading) {
     return (
       <div className="py-12 flex justify-center">
-        <BounceLoader size={50} color="#ec4899" />
+        <Loader size={50} />
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useVideo, useVideos } from "@/hooks/useVideo";
 import Layout from "@/components/Layout";
+import Loader from "@/components/Loader";
 import {
   useRef,
   useEffect,
@@ -78,7 +79,12 @@ export default function VideoDetail() {
     setHasScrolled(false);
   }, [id]);
 
-  if (isLoading) return <Layout>Loading…</Layout>;
+  if (isLoading)
+    return (
+      <Layout>
+        <Loader />
+      </Layout>
+    );
   if (isError || !video)
     return (
       <Layout>

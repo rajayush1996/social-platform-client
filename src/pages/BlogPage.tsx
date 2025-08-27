@@ -2,7 +2,7 @@ import BlogCard from "@/components/blog/BlogCard";
 import FeaturedBlog from "@/components/blog/FeaturedBlog";
 import { useBlogs } from "@/hooks/useBlog";
 import Layout from "@/components/Layout";
-import { BounceLoader } from "react-spinners";
+import Loader from "@/components/Loader";
 
 const BlogPage = () => {
   const { data: featuredData } = useBlogs({ featured: true, limit: 1 });
@@ -14,16 +14,7 @@ const BlogPage = () => {
   if (isLoading) {
     return (
       <Layout>
-        {/* full‐screen backdrop */}
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <BounceLoader
-            color="#ec4899"
-            loading={true}
-            size={250}
-            aria-label="Loading content"
-            data-testid="bounce-loader"
-          />
-        </div>
+        <Loader fullScreen size={250} />
       </Layout>
     );
   }

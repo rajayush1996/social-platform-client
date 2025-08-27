@@ -3,7 +3,7 @@ import VideoCard from "@/components/videos/VideoCard";
 import { useVideos } from "@/hooks/useVideo";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { BounceLoader } from "react-spinners";
+import Loader from "@/components/Loader";
 import { useSearchParams } from "react-router-dom";
 import CategoryNav from "@/components/CategoryNav";
 
@@ -28,16 +28,7 @@ const VideosPage = () => {
   if (isLoading) {
     return (
       <Layout>
-        {/* full‐screen backdrop */}
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <BounceLoader
-            color="#ec4899"
-            loading={true}
-            size={250}
-            aria-label="Loading content"
-            data-testid="bounce-loader"
-          />
-        </div>
+        <Loader fullScreen size={250} />
       </Layout>
     );
   }

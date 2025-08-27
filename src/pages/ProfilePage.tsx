@@ -34,6 +34,7 @@ import { useCategories } from "@/hooks/useCategories";
 import VideoCard from "@/components/videos/VideoCard";
 import ReelCard from "@/components/reels/ReelCard";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 const TABS = [
   { key: "posts", label: "Posts", icon: User },
@@ -297,7 +298,11 @@ const ProfilePage = () => {
   };
 
   if (!profile) {
-    return <div>Loading...</div>;
+    return (
+      <Layout>
+        <Loader fullScreen />
+      </Layout>
+    );
   }
 
   const handleTagKeyDown = (e) => {
@@ -450,8 +455,8 @@ const ProfilePage = () => {
                 </div>
               )}
               {videosLoading ? (
-                <div className="text-center text-base sm:text-lg text-muted-foreground">
-                  Loading...
+                <div className="flex justify-center">
+                  <Loader size={40} />
                 </div>
               ) : videosData?.results && videosData.results.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -482,8 +487,8 @@ const ProfilePage = () => {
                 </div>
               )}
               {reelsLoading ? (
-                <div className="text-center text-base sm:text-lg text-muted-foreground">
-                  Loading...
+                <div className="flex justify-center">
+                  <Loader size={40} />
                 </div>
               ) : reelsData?.results && reelsData.results.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

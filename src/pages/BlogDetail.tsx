@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/blog/BlogCard";
 import { useBlog, useBlogs } from "@/hooks/useBlog";
+import Loader from "@/components/Loader";
 
 const BlogDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +22,7 @@ const BlogDetail = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-grow pt-16 flex items-center justify-center">
-          <span className="text-lg text-muted-foreground">Loading article...</span>
+          <Loader />
         </main>
         <Footer />
       </div>

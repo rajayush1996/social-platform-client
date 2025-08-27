@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePaginatedContent } from "@/hooks/useHome";  // adjust path if needed
 import VideoCard from "@/components/videos/VideoCard";
-import { BounceLoader } from "react-spinners";
+import Loader from "@/components/Loader";
 import { Video } from "@/types/api.types";
 
 export default function FeaturedVideos({
@@ -36,7 +36,7 @@ export default function FeaturedVideos({
   if (isLoading) {
     return (
       <div className="py-12 flex justify-center">
-        <BounceLoader size={50} color="#ec4899" />
+        <Loader size={50} />
       </div>
     );
   }
