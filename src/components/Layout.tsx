@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EarnBanner from './EarnBanner';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,18 +13,24 @@ interface LayoutProps {
 }
 
 const Layout = ({ children, hideFooter = false }: LayoutProps) => {
-  const [bannerVisible, setBannerVisible] = useState(true);
+  const { isAuthenticated } = useAuth();
+  const [bannerVisible, setBannerVisible] = useState(!isAuthenticated);
   const bannerRef = useRef<HTMLDivElement>(null);
-  const navRef    = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const location = useLocation()
-  const isReels = location.pathname === '/reels';  
+  const location = useLocation();
+  const isReels = location.pathname === '/reels';
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      setBannerVisible(false);
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const measure = () => {
       let h = 0;
-      if (bannerVisible && bannerRef.current) {
+      if (!isAuthenticated && bannerVisible && bannerRef.current) {
         h += bannerRef.current.getBoundingClientRect().height;
       }
       if (navRef.current) {
@@ -34,7 +41,7 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
     measure();
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  }, [bannerVisible]);
+  }, [bannerVisible, isAuthenticated]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background"
@@ -44,7 +51,9 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
           : {}
       }>
       <div ref={bannerRef}>
-        {bannerVisible && <EarnBanner onClose={() => setBannerVisible(false)} />}
+        {!isAuthenticated && bannerVisible && (
+          <EarnBanner onClose={() => setBannerVisible(false)} />
+        )}
       </div>
       <div ref={navRef}>
         <Navbar />
