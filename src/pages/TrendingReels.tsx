@@ -109,7 +109,7 @@ export default function TrendingReels({
           >
             {reels.map((r) => (
               <div
-                key={r.mediaId}
+                key={r.mediaId || r._id}
                 className="flex-shrink-0 snap-start w-full sm:w-[260px] lg:w-[350px]"
               >
                 <ReelCard reel={r} />
