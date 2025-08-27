@@ -44,7 +44,6 @@ function App() {
               <Route path="/videos" element={<ProtectedRoute><VideosPage /></ProtectedRoute>} />
               <Route path="/videos/:id" element={<ProtectedRoute><VideoDetail /></ProtectedRoute>} />
               <Route path="/blog" element={<ProtectedRoute><BlogPage /></ProtectedRoute>} />
-              {/* <Route path="/reels/:id" element={<ProtectedRoute><ReelDetail /></ProtectedRoute>} /> */}
               <Route path="/blog/:id" element={<ProtectedRoute><BlogDetail /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 

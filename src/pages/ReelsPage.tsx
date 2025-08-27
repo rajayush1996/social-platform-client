@@ -17,7 +17,7 @@ import ReelsNavigation from "@/components/ReelsNavigation";
 import { useReelsInfinite } from "@/hooks/useReel";
 import Layout from "@/components/Layout";
 import { Reel } from "@/types/api.types";
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { BounceLoader } from "react-spinners";
 
 // Use an online placeholder avatar
@@ -299,6 +299,8 @@ const ReelCard = ({ reel }: { reel: Reel }) => {
 
 export default function ReelsPage() {
   const loaderRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const initialReelId = (location.state as any)?.reelId as string | undefined;
 
   const {
     data,
@@ -311,6 +313,13 @@ export default function ReelsPage() {
 
   // flatten all pages.results into one array
   const reels: Reel[] = data?.pages.flatMap((page) => page.results) ?? [];
+
+  useEffect(() => {
+    if (initialReelId) {
+      const element = document.getElementById(`reel-${initialReelId}`);
+      element?.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }, [data, initialReelId]);
 
   // infinite‐scroll observer
   useEffect(() => {
@@ -374,7 +383,9 @@ export default function ReelsPage() {
       <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center pt-24 px-2">
         <div className="w-full max-w-md flex flex-col gap-10">
           {reels.map((reel) => (
-            <ReelCard key={reel.id} reel={reel} />
+            <div key={reel.id} id={`reel-${reel.id}`}>
+              <ReelCard reel={reel} />
+            </div>
           ))}
 
           {/* sentinel for IntersectionObserver */}
