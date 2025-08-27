@@ -10,10 +10,11 @@ export interface ReelsPage {
   hasMore: boolean
 }
 
-export function useReelsInfinite(limit = 10) {
+export function useReelsInfinite(limit = 10, startKey?: string) {
   return useInfiniteQuery<ReelsPage, Error>({
-    // 1) your query key
-    queryKey: ['reels', limit],
+    // include startKey in query key so navigating to a different reel
+    // resets the cached pages and cancels any ongoing fetches
+    queryKey: ['reels', limit, startKey],
     // 2) initial page
     initialPageParam: 1,
     // 3) how to fetch a page

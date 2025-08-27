@@ -1,7 +1,8 @@
 // pages/ReelsPage.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
 import ReelsNavigation from "@/components/ReelsNavigation";
 import { useReelsInfinite } from "@/hooks/useReel";
@@ -12,11 +13,13 @@ export default function ReelsPage() {
   const loaderRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
   const startId = searchParams.get("reelId");
+  const queryClient = useQueryClient();
+  const limit = 10;
 
   const {
     data, isLoading, isError,
     fetchNextPage, hasNextPage, isFetchingNextPage,
-  } = useReelsInfinite(10);
+  } = useReelsInfinite(limit, startId ?? undefined);
 
   const reels = data?.pages.flatMap(p => p.results) || [];
 
@@ -35,16 +38,31 @@ export default function ReelsPage() {
     return () => obs.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  const [targetFound, setTargetFound] = useState(false);
+
   // When arriving with a reelId, load pages until it's found then scroll to it
   useEffect(() => {
     if (!startId) return;
     const el = document.getElementById(`reel-${startId}`);
     if (el) {
       el.scrollIntoView({ behavior: "auto", block: "start" });
-    } else if (hasNextPage && !isFetchingNextPage) {
+      setTargetFound(true);
+    } else if (!targetFound && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [startId, data, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [startId, data, hasNextPage, isFetchingNextPage, fetchNextPage, targetFound]);
+
+  // reset targetFound whenever startId changes
+  useEffect(() => {
+    setTargetFound(false);
+  }, [startId]);
+
+  // cancel any ongoing fetches when leaving the page
+  useEffect(() => {
+    return () => {
+      queryClient.cancelQueries({ queryKey: ['reels', limit, startId ?? undefined] });
+    };
+  }, [queryClient, startId]);
 
   if (isLoading) {
     return (

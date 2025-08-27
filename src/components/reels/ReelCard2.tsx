@@ -53,7 +53,10 @@ export function ReelCard({ reel }: { reel: Reel }) {
         setInView(e.isIntersecting);
         const v = videoRef.current;
         if (!e.isIntersecting && v) {
+          // stop playback and unload the video when it leaves the viewport
           v.pause();
+          v.removeAttribute("src");
+          v.load();
           v.currentTime = 0;
           setPlaying(false);
           setLoading(true);
@@ -91,7 +94,8 @@ export function ReelCard({ reel }: { reel: Reel }) {
     if (playing) v.pause(); else v.play().catch(() => {});
     setPlaying(!playing);
   };
-  const toggleMute = () => {
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const v = videoRef.current;
     if (!v) return;
     v.muted = !v.muted;
