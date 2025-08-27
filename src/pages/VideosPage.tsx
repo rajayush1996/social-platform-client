@@ -68,23 +68,31 @@ const VideosPage = () => {
   const getPageNumbers = (total: number) => {
     const pages: (number | string)[] = [];
     const firstBlockEnd = Math.min(6, total);
-    for (let i = 1; i <= firstBlockEnd; i++) pages.push(i);
-    if (total > firstBlockEnd) {
-      const checkpoints = [
-        Math.floor(total / 2),
-        Math.floor((total * 2) / 3),
-        total - 2,
-        total,
-      ];
-      let last = firstBlockEnd;
-      checkpoints.forEach((cp) => {
-        if (cp > last && cp <= total) {
-          if (cp - last > 1) pages.push("...");
-          pages.push(cp);
-          last = cp;
-        }
-      });
+
+    for (let i = 1; i <= firstBlockEnd; i++) {
+      pages.push(i);
     }
+
+    if (total > firstBlockEnd) {
+      const mid = Math.ceil(total / 2);
+
+      if (mid - firstBlockEnd > 1) {
+        pages.push("...");
+      }
+
+      if (mid > firstBlockEnd && mid < total) {
+        pages.push(mid);
+      }
+
+      if (total - mid > 1) {
+        pages.push("...");
+      }
+
+      if (mid !== total) {
+        pages.push(total);
+      }
+    }
+
     return pages;
   };
 
@@ -128,16 +136,19 @@ const VideosPage = () => {
                 <button
                   key={num}
                   onClick={() => setPage(num)}
-                  className={`px-3 py-1 rounded ${
+                  className={`w-8 h-8 flex items-center justify-center rounded ${
                     page === num
-                      ? "bg-pink-500 text-white"
-                      : "bg-gray-200 text-gray-700"
+                      ? "bg-white text-black"
+                      : "bg-gray-800 text-gray-200"
                   }`}
                 >
                   {num}
                 </button>
               ) : (
-                <span key={`ellipsis-${idx}`} className="px-2">
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="px-2 text-gray-400"
+                >
                   {num}
                 </span>
               )
