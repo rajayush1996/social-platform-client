@@ -7,10 +7,10 @@ import {
   MessageCircle,
   Share2,
   Play,
-  Pause,
   Loader2,
   VolumeX,
   Volume2,
+  RotateCcw,
 } from "lucide-react";
 import ReelVideoPlayer from "@/components/HlsReel";
 import { Reel } from "@/types/api.types";
@@ -37,6 +37,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [inView, setInView] = useState(false);
+  const [showReplay, setShowReplay] = useState(false);
 
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(reel.stats?.likes || 0);
@@ -60,6 +61,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
           v.currentTime = 0;
           setPlaying(false);
           setLoading(true);
+          setShowReplay(false);
         } else if (e.isIntersecting) {
           setLoading(true);
         }
@@ -91,6 +93,13 @@ export function ReelCard({ reel }: { reel: Reel }) {
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
+    if (showReplay) {
+      v.currentTime = 0;
+      v.play().catch(() => {});
+      setPlaying(true);
+      setShowReplay(false);
+      return;
+    }
     if (playing) v.pause(); else v.play().catch(() => {});
     setPlaying(!playing);
   };
@@ -136,6 +145,10 @@ export function ReelCard({ reel }: { reel: Reel }) {
             onError={handleError}
             className="w-full h-full object-cover"
             onClick={togglePlay}
+            onEnded={() => {
+              setPlaying(false);
+              setShowReplay(true);
+            }}
           />
         ) : (
           <img
@@ -154,14 +167,23 @@ export function ReelCard({ reel }: { reel: Reel }) {
           {muted ? <VolumeX className="text-white" /> : <Volume2 className="text-white" />}
         </button>
 
-        {/* Play/Pause center */}
+        {/* Play/Pause center or replay */}
         {!playing && (
-          <button
-            onClick={togglePlay}
-            className="absolute inset-0 m-auto w-16 h-16 flex items-center justify-center text-white z-20 pointer-events-auto"
-          >
-            <Play size={40} className="animate-pulse" />
-          </button>
+          showReplay ? (
+            <button
+              onClick={togglePlay}
+              className="absolute inset-0 m-auto w-16 h-16 flex items-center justify-center text-white z-20 pointer-events-auto"
+            >
+              <RotateCcw size={40} />
+            </button>
+          ) : (
+            <button
+              onClick={togglePlay}
+              className="absolute inset-0 m-auto w-16 h-16 flex items-center justify-center text-white z-20 pointer-events-auto"
+            >
+              <Play size={40} className="animate-pulse" />
+            </button>
+          )
         )}
 
         {/* Bottom overlay: user info + actions */}
