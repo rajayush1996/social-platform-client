@@ -8,6 +8,7 @@ import { Card } from "../ui/card";
 
 export default function ReelCard({ reel }: { reel: any }) {
   const { mediaId, title, stats, previewUrl, thumbnailUrl, videoUrl } = reel;
+  const id = mediaId ?? reel._id ?? reel.id;
 
   // show duration (mm:ss) from actual streaming URL
   const duration = formatDuration(reel.lengthSec);
@@ -62,7 +63,7 @@ export default function ReelCard({ reel }: { reel: any }) {
   };
 
   return (
-    <Link to={`/reels`}>
+    <Link to={`/reels?reelId=${id}`}>
       <Card
         className="overflow-hidden relative h-[500px] lg:h-[500px] lg:w-[350px]"
         onMouseEnter={handleMouseEnter}

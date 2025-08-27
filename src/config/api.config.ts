@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_PUBLIC_API_BASE_URL ? `${import.meta.env.VITE_PUBLIC_API_BASE_URL}/api/v1` : 'http://localhost:3000/api/v1',
+  BASE_URL: import.meta.env.VITE_PUBLIC_API_BASE_URL ? `${import.meta.env.VITE_PUBLIC_API_BASE_URL}/api/v1` : 'http://localhost:3005/api/v1',
   ENDPOINTS: {
     // Auth
     AUTH: {
