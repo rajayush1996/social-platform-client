@@ -18,7 +18,7 @@ export default function CategoryNav({
   // Always include “All” at the front
   const categories = [
     { id: "all", name: "All" },
-    ...(categoriesData?.results || []).map((cat) => ({
+    ...(categoriesData|| []).map((cat) => ({
       id: cat.id,
       name: cat.name,
     })),

@@ -23,7 +23,7 @@ interface CategoriesResponse {
 }
 
 export function useCategories() {
-  return useQuery<CategoriesResponse>({
+  return useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await axiosInstance.get(API_CONFIG.ENDPOINTS.USER.CATEGORIES);
