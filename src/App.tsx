@@ -11,6 +11,7 @@ import VideosPage from "./pages/VideosPage";
 import VideoDetail from "./pages/VideoDetail";
 import BlogPage from "./pages/BlogPage";
 // import ReelDetail from "./pages/ReelDetail";
+import ReelPage from "./pages/ReelPage";
 import BlogDetail from "./pages/BlogDetail";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
@@ -41,6 +42,7 @@ function App() {
               {/* Protected Routes */}
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/reels" element={<ProtectedRoute><ReelsPage /></ProtectedRoute>} />
+              <Route path="/reels/:id" element={<ProtectedRoute><ReelPage /></ProtectedRoute>} />
               <Route path="/videos" element={<ProtectedRoute><VideosPage /></ProtectedRoute>} />
               <Route path="/videos/:id" element={<ProtectedRoute><VideoDetail /></ProtectedRoute>} />
               <Route path="/blog" element={<ProtectedRoute><BlogPage /></ProtectedRoute>} />

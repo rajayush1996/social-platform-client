@@ -66,7 +66,7 @@ export default function ReelCard({ reel }) {
   };
 
   return (
-    <Link to={`/reels`}>      
+    <Link to={`/reels/${id}`}>
       <Card
         className="overflow-hidden relative h-[500px]  lg:h-[500px] lg:w-[350px]"
         onMouseEnter={handleMouseEnter}

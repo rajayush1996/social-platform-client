@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import axiosInstance from '@/lib/axios'
 import { API_CONFIG } from '@/config/api.config'
 
@@ -16,6 +16,9 @@ export interface Reel {
   updatedAt: string
   thumbnailUrl: string | null
   mediaFileUrl: string
+  mediaDetails?: {
+    url: string
+  }
 }
 
 export interface ReelsPage {
@@ -40,5 +43,18 @@ export function useReelsInfinite(limit = 10) {
       return data.data as ReelsPage
     },
     getNextPageParam: (last) => (last.hasMore ? last.currentPage + 1 : undefined),
+  })
+}
+
+export function useReel(id: string) {
+  return useQuery<Reel, Error>({
+    queryKey: ['reel', id],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get(
+        API_CONFIG.ENDPOINTS.USER.REELS_DETAIL(id)
+      )
+      return data.data as Reel
+    },
+    enabled: !!id,
   })
 }

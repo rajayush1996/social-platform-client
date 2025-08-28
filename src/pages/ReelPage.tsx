@@ -11,7 +11,9 @@ export default function ReelPage() {
   const navigate = useNavigate();
   const { data: reel, isLoading, isError } = useReel(id!);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const duration = useVideoDuration(reel?.mediaFileUrl || '');
+  const duration = useVideoDuration(
+    reel?.mediaFileUrl || reel?.mediaDetails?.url || ''
+  );
   const [muted, setMuted] = React.useState(true);
 
   useEffect(() => {
@@ -19,6 +21,10 @@ export default function ReelPage() {
       videoRef.current.muted = muted;
     }
   }, [muted]);
+
+  useEffect(() => {
+    videoRef.current?.play().catch(() => {});
+  }, [reel]);
 
   if (isLoading) return <p>Loading reel...</p>;
   if (isError || !reel) return <p>Failed to load reel.</p>;
@@ -32,10 +38,12 @@ export default function ReelPage() {
       <div className="relative rounded-lg overflow-hidden bg-black">
         <video
           ref={videoRef}
-          src={reel.mediaDetails.url}
+          src={reel.mediaDetails?.url || reel.mediaFileUrl}
           controls
           loop
           playsInline
+          autoPlay
+          muted={muted}
           className="w-full h-auto"
         />
         <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
