@@ -995,7 +995,7 @@ const ProfilePage = () => {
                     className="w-full rounded px-3 py-2 border border-border bg-background/80"
                   >
                     <option value="">Select</option>
-                    {categoriesData?.results.map((cat) => (
+                    {categoriesData.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
                       </option>
