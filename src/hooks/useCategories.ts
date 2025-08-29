@@ -22,12 +22,17 @@ interface CategoriesResponse {
   currentPage: number;
 }
 
-export function useCategories() {
+export function useCategories(type: string) {
   return useQuery<Category[]>({
-    queryKey: ["categories"],
+    queryKey: ['categories', type],
     queryFn: async () => {
-      const res = await axiosInstance.get(API_CONFIG.ENDPOINTS.USER.CATEGORIES);
+      const res = await axiosInstance.get(
+        API_CONFIG.ENDPOINTS.USER.CATEGORIES,
+        { params: { type } }
+      );
       return res.data.data;
     },
+    // optional: avoid firing if type is empty
+    enabled: !!type,
   });
 }
