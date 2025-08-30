@@ -74,6 +74,9 @@ export const API_CONFIG = {
       LIKED_MEDIA: '/media/liked',
       CATEGORIES: '/media/categories',
     },
+    REELS: {
+      INCREMENT_VIEW: (id: string) => `/reels/${id}/view`,
+    },
     // Blog
     BLOG: {
       LIST: '/user/blogs',

@@ -3,8 +3,8 @@
 
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { useRef, useState } from "react";
-import { formatDuration } from "@/lib/utils";
+import { useState } from "react";
+import { formatDuration, formatCount } from "@/lib/utils";
 
 export default function VideoCard({ v }: any) {
   const {
@@ -17,8 +17,13 @@ export default function VideoCard({ v }: any) {
   } = v;
 
   const duration = formatDuration(lengthSec);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
+
+  const views = v.stats?.views ?? v.views ?? 0;
+  const reviews =
+    v.stats?.comments ?? v.stats?.reviews ?? v.reviewCount ?? 0;
+  const formattedViews = formatCount(views);
+  const formattedReviews = formatCount(reviews);
 
   return (
     <Link to={`/videos/${id}`}>
@@ -51,7 +56,9 @@ export default function VideoCard({ v }: any) {
           <h3 className="font-medium mb-2 line-clamp-2 truncate">{title}</h3>
           <div className="mt-auto flex justify-between text-sm text-card-foreground/70">
             <span>{author || "Unknown"}</span>
-            <span>0 views</span>
+            <span>
+              {formattedViews} views • {formattedReviews} reviews
+            </span>
           </div>
         </div>
       </Card>

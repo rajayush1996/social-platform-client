@@ -2,15 +2,17 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useVideo, useVideos } from "@/hooks/useVideo";
+import { useVideo, useVideos, useIncrementVideoView } from "@/hooks/useVideo";
 import Layout from "@/components/Layout";
 import Loader from "@/components/Loader";
+import { formatCount } from "@/lib/utils";
 import {
   useRef,
   useEffect,
   forwardRef,
   useImperativeHandle,
   useState,
+  type SyntheticEvent,
 } from "react";
 import Hls from "hls.js";
 
@@ -54,6 +56,7 @@ export default function VideoDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: video, isLoading, isError } = useVideo(id!);
+  const { mutate: incrementView } = useIncrementVideoView();
   const { data: recsData, isLoading: recsLoading } = useVideos({
     selectedMediaId: id,
     recommend: true,
@@ -61,6 +64,13 @@ export default function VideoDetail() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const hasIncremented = useRef(false);
+  const [views, setViews] = useState(0);
+
+  useEffect(() => {
+    setViews(video?.views ?? video?.stats?.views ?? 0);
+    hasIncremented.current = false;
+  }, [video]);
 
   // SCROLL INTO VIEW on initial load
   useEffect(() => {
@@ -78,6 +88,20 @@ export default function VideoDetail() {
   useEffect(() => {
     setHasScrolled(false);
   }, [id]);
+
+  const VIEW_INCREMENT_THRESHOLD = 20; // seconds of watch time before counting a view
+
+  const handleTimeUpdate = (e: SyntheticEvent<HTMLVideoElement>) => {
+    if (
+      !hasIncremented.current &&
+      video?._id &&
+      e.currentTarget.currentTime >= VIEW_INCREMENT_THRESHOLD
+    ) {
+      incrementView(video._id);
+      setViews((v) => v + 1);
+      hasIncremented.current = true;
+    }
+  };
 
   if (isLoading)
     return (
@@ -97,6 +121,9 @@ export default function VideoDetail() {
       </Layout>
     );
 
+  const formattedViews = formatCount(views);
+  const formattedReviews = formatCount(video.stats?.comments ?? 0);
+
   return (
     <Layout>
       <div className="px-4 py-6">
@@ -115,6 +142,7 @@ export default function VideoDetail() {
             src={video.videoUrl}
             poster={video.thumbnailUrl}
             className="w-full h-auto rounded-lg shadow-lg"
+            onTimeUpdate={handleTimeUpdate}
           />
         </div>
 
@@ -122,7 +150,7 @@ export default function VideoDetail() {
         <div className="max-w-4xl mx-auto text-white space-y-1">
           <h1 className="text-3xl font-bold">{video.title}</h1>
           <p className="text-sm text-gray-400">
-            By {video.username || "Unknown"} • {video.views} views
+            By {video.username || "Unknown"} • {formattedViews} views • {formattedReviews} reviews
           </p>
           {video.description && (
             <p className="mt-2 text-gray-200">{video.description}</p>

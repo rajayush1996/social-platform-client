@@ -118,4 +118,21 @@ export const useSaveVideo = () => {
       queryClient.invalidateQueries({ queryKey: ['videos'] });
     },
   });
-}; 
+};
+
+export const useIncrementVideoView = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await axiosInstance.put(
+        API_CONFIG.ENDPOINTS.MEDIA.INCREMENT_VIEW(id)
+      );
+      return response.data.data;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["video", id] });
+      queryClient.invalidateQueries({ queryKey: ["videos"] });
+    },
+  });
+};
