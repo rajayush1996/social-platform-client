@@ -46,6 +46,8 @@ export default function ReelsPage() {
     const el = document.getElementById(`reel-${startId}`);
     if (el) {
       el.scrollIntoView({ behavior: "auto", block: "start" });
+      const video = el.querySelector("video") as HTMLVideoElement | null;
+      video?.play().catch(() => {});
       setTargetFound(true);
     } else if (!targetFound && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -92,13 +94,16 @@ export default function ReelsPage() {
         "
         style={{ top: 'var(--header-height)' }}
       >
-        {reels.map((r: any) => (
-          <div id={`reel-${r._id}`} key={r._id} className="snap-start h-full flex justify-center">
-            <div className="w-full max-w-md h-full">
-              <ReelCard reel={r}/>
+        {reels.map((r: any) => {
+          const reelId = r._id ?? r.mediaId ?? r.id;
+          return (
+            <div id={`reel-${reelId}`} key={reelId} className="snap-start h-full flex justify-center">
+              <div className="w-full max-w-md h-full">
+                <ReelCard reel={r}/>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div ref={loaderRef} className="h-1"/>
       </div>
 
