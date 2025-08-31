@@ -10,5 +10,7 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+
 User-agent: *
 Allow: /
+Sitemap: https://lustyhub.com/sitemap.xml

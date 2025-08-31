@@ -1,40 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LustyHub</title>
-    <meta name="description" content="Porn site" />
-    <meta name="author" content="lustyhub" />
 
-    <meta property="og:title" content="LustyHub" />
-    <meta property="og:description" content="LustyHub" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://lustyhub.com/" />
-    <meta property="og:image" content="LustyHub" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="google-site-verification" content="IAqg0JU7FHE5v6gW2ZfqffBP9NPeoTy2kYSgcFXve5Q" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LustyHub</title>
+
+  <!-- SEO -->
+  <meta name="description"
+    content="LustyHub is the premier platform for adult entertainment. Explore trending videos, blogs, and categories." />
+  <meta name="author" content="LustyHub" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:title" content="LustyHub" />
+  <meta property="og:description" content="Premium adult videos, trending content, and more." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lustyhub.com/" />
+  <meta property="og:image" content="https://lustyhub.com/images/preview.jpg" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Google Search Console -->
+  <meta name="google-site-verification" content="IAqg0JU7FHE5v6gW2ZfqffBP9NPeoTy2kYSgcFXve5Q" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@lovable_dev" />
+  <meta name="twitter:title" content="LustyHub" />
+  <meta name="twitter:description" content="Premium adult videos, trending content, and more." />
+  <meta name="twitter:image" content="https://lustyhub.com/images/preview.jpg" />
+</head>
 
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="LustyHub" />
-  </head>
+<body>
+  <div id="root"></div>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "LustyHub",
+  "url": "https://lustyhub.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://lustyhub.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
 
-  <body>
-    <div id="root"></div>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Entertainment",
-      "name": "LustyHub",
-      "url": "https://lustyhub.com",
-      "logo": "https://lustyhub.com/logo.png"
-    }
-    </script>
 
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+  <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
