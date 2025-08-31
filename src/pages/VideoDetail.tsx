@@ -15,6 +15,7 @@ import {
   type SyntheticEvent,
 } from "react";
 import Hls from "hls.js";
+import SEO from "@/components/SEO";
 
 // HLS‐aware <video> wrapper
 type HlsVideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & {
@@ -133,6 +134,13 @@ export default function VideoDetail() {
 
   return (
     <Layout>
+      <SEO
+        title={video.title}
+        description={video.description || ""}
+        canonical={`https://lustyhub.com/videos/${id}`}
+        keywords={video.title}
+        image={video.thumbnailUrl}
+      />
       <div className="px-4 py-6">
         {/* Back button */}
         <Button

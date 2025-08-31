@@ -6,6 +6,7 @@ import CategoryNav from "@/components/CategoryNav";
 import TrendingReels from "./TrendingReels";
 import FeaturedVideos from "./FeaturedVideos";
 import TrendingVideos from "./TrendingVideos";
+import SEO from "@/components/SEO";
 
 
 // infinite for “latestVideos”
@@ -66,6 +67,12 @@ export default function Index() {
   
   return (
     <Layout>
+      <SEO
+        title="Porn Videos | lustyhub | LustyHub"
+        description="Discover trending sex videos, porn reels and porn blogs."
+        canonical="https://lustyhub.com/"
+        keywords="videos, reels, blogs, lustyHub, sex, porn, hot, fuck, fun, entertaiment, lust, boobs, nude"
+      />
       <CategoryNav
         activeCategory={category}
         onCategoryChange={setCategory}
