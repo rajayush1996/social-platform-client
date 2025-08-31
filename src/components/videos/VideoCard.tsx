@@ -16,6 +16,14 @@ export default function VideoCard({ v }: any) {
     lengthSec,
   } = v;
 
+  const authorName =
+    author ||
+    v.username ||
+    v.user?.displayName ||
+    (v.createdBy === 'admin' ? 'Admin' : undefined) ||
+    'Unknown';
+
+
   const duration = formatDuration(lengthSec);
   const [hovered, setHovered] = useState(false);
 
@@ -55,10 +63,11 @@ export default function VideoCard({ v }: any) {
         <div className="flex-1 p-4 flex flex-col">
           <h3 className="font-medium mb-2 line-clamp-2 truncate">{title}</h3>
           <div className="mt-auto flex justify-between text-sm text-card-foreground/70">
-            <span>{author || "Unknown"}</span>
+            <span>{authorName}</span>
             <span>
-              {formattedViews} views • {formattedReviews} reviews
+              {formattedViews} views
             </span>
+             {/* {formattedReviews} reviews */}
           </div>
         </div>
       </Card>

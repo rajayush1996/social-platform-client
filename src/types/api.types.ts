@@ -132,6 +132,12 @@ export interface Video {
   id?: string;
   description?: string;
   username?: string;
+  createdBy?: string;
+  user?: {
+    id: string;
+    displayName: string;
+    avatar?: string;
+  };
 }
 
 export interface Reel extends BaseContent {

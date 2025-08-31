@@ -124,6 +124,13 @@ export default function VideoDetail() {
   const formattedViews = formatCount(views);
   const formattedReviews = formatCount(video.stats?.comments ?? 0);
 
+  const authorName =
+    video.username ||
+    video.author ||
+    video.user?.displayName ||
+    (video.createdBy === 'admin' ? 'Admin' : undefined) ||
+    'Unknown';
+
   return (
     <Layout>
       <div className="px-4 py-6">
@@ -150,7 +157,7 @@ export default function VideoDetail() {
         <div className="max-w-4xl mx-auto text-white space-y-1">
           <h1 className="text-3xl font-bold">{video.title}</h1>
           <p className="text-sm text-gray-400">
-            By {video.username || "Unknown"} • {formattedViews} views • {formattedReviews} reviews
+            By {authorName} • {formattedViews} views • {formattedReviews} reviews
           </p>
           {video.description && (
             <p className="mt-2 text-gray-200">{video.description}</p>
