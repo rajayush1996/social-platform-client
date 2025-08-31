@@ -128,9 +128,7 @@ export interface Video {
     _id: string;
     name: string;
   };
-  stats?: {
-    views: number;
-  };
+  stats?: Stats;
   id?: string;
   description?: string;
   username?: string;

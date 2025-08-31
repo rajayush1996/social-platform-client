@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import ReelVideoPlayer from "@/components/HlsReel";
 import { Reel } from "@/types/api.types";
+import { useIncrementReelView } from "@/hooks/useReel";
 
 const avatar =
   "https://ui-avatars.com/api/?name=User&background=6c47ff&color=fff";
@@ -31,6 +32,8 @@ interface Comment {
 export function ReelCard({ reel }: { reel: Reel }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hasIncremented = useRef(false);
+  const { mutate: incrementView } = useIncrementReelView();
 
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
@@ -122,6 +125,19 @@ export function ReelCard({ reel }: { reel: Reel }) {
     setInput("");
   };
 
+  const VIEW_INCREMENT_THRESHOLD = 20;
+
+  const handleTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    if (
+      !hasIncremented.current &&
+      reel._id &&
+      e.currentTarget.currentTime >= VIEW_INCREMENT_THRESHOLD
+    ) {
+      incrementView(reel._id);
+      hasIncremented.current = true;
+    }
+  };
+
   return (
     <Card
       ref={containerRef}
@@ -149,6 +165,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
               setPlaying(false);
               setShowReplay(true);
             }}
+            onTimeUpdate={handleTimeUpdate}
           />
         ) : (
           <img

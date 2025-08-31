@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axiosInstance from '@/lib/axios'
 import { API_CONFIG } from '@/config/api.config'
 import type { Reel } from '@/types/api.types'
@@ -26,5 +26,22 @@ export function useReelsInfinite(limit = 10, startKey?: string) {
       return data.data as ReelsPage
     },
     getNextPageParam: (last) => (last.hasMore ? last.currentPage + 1 : undefined),
+  })
+}
+
+export const useIncrementReelView = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await axiosInstance.put(
+        API_CONFIG.ENDPOINTS.REELS.INCREMENT_VIEW(id)
+      )
+      return data.data
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['reels'] })
+      queryClient.invalidateQueries({ queryKey: ['reel', id] })
+    },
   })
 }
