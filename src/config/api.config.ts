@@ -75,7 +75,7 @@ export const API_CONFIG = {
       CATEGORIES: '/media/categories',
     },
     REELS: {
-      INCREMENT_VIEW: (id: string) => `/reels/${id}/view`,
+      INCREMENT_VIEW: (id: string) => `/user/reels/${id}/view`,
     },
     // Blog
     BLOG: {
