@@ -1,4 +1,9 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from '@tanstack/react-query'
 import axiosInstance from '@/lib/axios'
 import { API_CONFIG } from '@/config/api.config'
 import type { Reel } from '@/types/api.types'
@@ -40,7 +45,29 @@ export const useIncrementReelView = () => {
       return data.data
     },
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['reels'] })
+      queryClient.setQueriesData<InfiniteData<ReelsPage>>(
+        { queryKey: ['reels'] },
+        (old) => {
+          if (!old) return old
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              results: page.results.map((reel) =>
+                reel._id === id
+                  ? {
+                      ...reel,
+                      stats: {
+                        ...reel.stats,
+                        views: (reel.stats?.views ?? 0) + 1,
+                      },
+                    }
+                  : reel
+              ),
+            })),
+          }
+        }
+      )
       queryClient.invalidateQueries({ queryKey: ['reel', id] })
     },
   })
