@@ -15,6 +15,7 @@ import {
 import ReelVideoPlayer from "@/components/HlsReel";
 import { Reel } from "@/types/api.types";
 import { useIncrementReelView } from "@/hooks/useReel";
+import ReelScrubber from "@/components/reels/ReelScrubber";
 
 const avatar =
   "https://ui-avatars.com/api/?name=User&background=6c47ff&color=fff";
@@ -41,6 +42,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
   const [error, setError] = useState(false);
   const [inView, setInView] = useState(false);
   const [showReplay, setShowReplay] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(reel.stats?.likes || 0);
@@ -65,6 +67,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
           setPlaying(false);
           setLoading(true);
           setShowReplay(false);
+          setProgress(0);
         } else if (e.isIntersecting) {
           setLoading(true);
         }
@@ -101,6 +104,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
       v.play().catch(() => {});
       setPlaying(true);
       setShowReplay(false);
+      setProgress(0);
       return;
     }
     if (playing) v.pause(); else v.play().catch(() => {});
@@ -125,13 +129,16 @@ export function ReelCard({ reel }: { reel: Reel }) {
     setInput("");
   };
 
-  const VIEW_INCREMENT_THRESHOLD = 20;
+  const VIEW_INCREMENT_THRESHOLD = Math.min(20, reel.lengthSec || 20);
 
   const handleTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const current = e.currentTarget.currentTime;
+    const duration = e.currentTarget.duration || reel.lengthSec || 1;
+    setProgress(current / duration);
     if (
       !hasIncremented.current &&
       reel._id &&
-      e.currentTarget.currentTime >= VIEW_INCREMENT_THRESHOLD
+      current >= VIEW_INCREMENT_THRESHOLD
     ) {
       incrementView(reel._id);
       hasIncremented.current = true;
@@ -143,6 +150,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
       ref={containerRef}
       className="relative w-full h-full overflow-hidden bg-black flex flex-col justify-end p-0 m-0"
     >
+      <ReelScrubber progress={progress} />
       {/* Video layer */}
       <div className="absolute inset-0 w-full h-full">
         {loading && inView && (
@@ -164,6 +172,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
             onEnded={() => {
               setPlaying(false);
               setShowReplay(true);
+              setProgress(1);
             }}
             onTimeUpdate={handleTimeUpdate}
           />
