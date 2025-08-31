@@ -125,7 +125,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
     setInput("");
   };
 
-  const VIEW_INCREMENT_THRESHOLD = 20;
+  const VIEW_INCREMENT_THRESHOLD = Math.min(20, reel.lengthSec || 20);
 
   const handleTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     if (
