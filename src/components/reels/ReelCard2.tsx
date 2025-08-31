@@ -145,12 +145,20 @@ export function ReelCard({ reel }: { reel: Reel }) {
     }
   };
 
+  const handleSeek = (ratio: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    const duration = v.duration || reel.lengthSec || 1;
+    v.currentTime = ratio * duration;
+    setProgress(ratio);
+  };
+
   return (
     <Card
       ref={containerRef}
       className="relative w-full h-full overflow-hidden bg-black flex flex-col justify-end p-0 m-0"
     >
-      <ReelScrubber progress={progress} />
+      <ReelScrubber progress={progress} onSeek={handleSeek} />
       {/* Video layer */}
       <div className="absolute inset-0 w-full h-full">
         {loading && inView && (
