@@ -70,8 +70,17 @@ export default function VideoDetail() {
 
   useEffect(() => {
     setViews(video?.views ?? video?.stats?.views ?? 0);
+  }, [video?.views, video?.stats?.views, id]);
+
+  useEffect(() => {
     hasIncremented.current = false;
-  }, [video]);
+    setHasScrolled(false);
+  }, [id]);
+
+  // useEffect(() => {
+  //   setViews(video?.views ?? video?.stats?.views ?? 0);
+  //   hasIncremented.current = false;
+  // }, [video]);
 
   // SCROLL INTO VIEW on initial load
   useEffect(() => {
@@ -86,9 +95,9 @@ export default function VideoDetail() {
   }, [isLoading, video, hasScrolled]);
 
   // Reset scroll flag when switching videos
-  useEffect(() => {
-    setHasScrolled(false);
-  }, [id]);
+  // useEffect(() => {
+  //   setHasScrolled(false);
+  // }, [id]);
 
   const VIEW_INCREMENT_THRESHOLD = 20; // seconds of watch time before counting a view
 
