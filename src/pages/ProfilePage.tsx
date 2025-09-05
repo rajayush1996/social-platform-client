@@ -101,7 +101,7 @@ const ProfilePage = () => {
     libraryId: config.streamLibraryId,
     apiKey: config.streamApiKey,
   });
-  const { data: categoriesData } = useCategories();
+  const { data: categoriesData } = useCategories({ isActive: true, type: "videos", sortBy: "name" });
   const [showUpload, setShowUpload] = useState(false);
   const [uploadType, setUploadType] = useState<"video" | "reel">("video");
   const [mediaForm, setMediaForm] = useState({

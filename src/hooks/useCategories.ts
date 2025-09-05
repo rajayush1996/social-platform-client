@@ -22,11 +22,20 @@ interface CategoriesResponse {
   currentPage: number;
 }
 
-export function useCategories() {
+export interface CategoryQueryParams {
+  type?: string;                // e.g. "videos | reels | blogs"
+  sortBy?: string;              // default "createdAt"
+  isActive?: boolean;
+  parentId?: string;
+}
+
+export function useCategories(params: CategoryQueryParams = { sortBy: "createdAt" }) {
   return useQuery<Category[]>({
-    queryKey: ["categories"],
+    queryKey: ["categories", params], // include params in the key for caching
     queryFn: async () => {
-      const res = await axiosInstance.get(API_CONFIG.ENDPOINTS.USER.CATEGORIES);
+      const res = await axiosInstance.get(API_CONFIG.ENDPOINTS.USER.CATEGORIES, {
+        params, // axios will build query string automatically
+      });
       return res.data.data;
     },
   });

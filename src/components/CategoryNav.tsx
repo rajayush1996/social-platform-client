@@ -12,7 +12,8 @@ export default function CategoryNav({
   onCategoryChange,
   activeCategory
 }: CategoryNavProps) {
-  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
+
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories({ isActive: true, type: "videos", sortBy: "name" });
   const navigate = useNavigate();
 
   // Always include “All” at the front
