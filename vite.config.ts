@@ -20,4 +20,21 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/videojs-ima")) {
+            return "videojs-ima";
+          }
+
+          if (id.includes("node_modules/videojs-contrib-ads")) {
+            return "videojs-contrib-ads";
+          }
+
+          return undefined;
+        },
+      },
+    },
+  },
 }));

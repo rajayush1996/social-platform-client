@@ -16,6 +16,10 @@ import {
 } from "react";
 import Hls from "hls.js";
 import SEO from "@/components/SEO";
+import { exoClickAdConfig } from "@/config/ads.config";
+import VideoWithAds from "@/components/ads/VideoWithAds";
+// import ExoClickAd from "@/components/ads/ExoClickAd";
+// import { exoClickAdConfig } from "@/config/ads.config";
 
 // HLS‐aware <video> wrapper
 type HlsVideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & {
@@ -100,6 +104,8 @@ export default function VideoDetail() {
   // }, [id]);
 
   const VIEW_INCREMENT_THRESHOLD = 20; // seconds of watch time before counting a view
+  // const videoAdConfig = exoClickAdConfig.videoDetail;
+  // const shouldShowAd = Boolean(videoAdConfig.zoneId);
 
   const handleTimeUpdate = (e: SyntheticEvent<HTMLVideoElement>) => {
     if (
@@ -138,8 +144,8 @@ export default function VideoDetail() {
     video.username ||
     video.author ||
     video.user?.displayName ||
-    (video.createdBy === 'admin' ? 'Admin' : undefined) ||
-    'Unknown';
+    (video.createdBy === "admin" ? "Admin" : undefined) ||
+    "Unknown";
 
   return (
     <Layout>
@@ -162,24 +168,52 @@ export default function VideoDetail() {
 
         {/* Video Container with auto-scroll ref */}
         <div ref={containerRef} tabIndex={0} className="max-w-4xl mx-auto mb-6">
-          <HlsVideo
-            src={video.videoUrl}
+          {exoClickAdConfig.videoDetail.vastTagUrl ? (
+          <VideoWithAds
+            videoUrl={video.videoUrl}
             poster={video.thumbnailUrl}
-            className="w-full h-auto rounded-lg shadow-lg"
-            onTimeUpdate={handleTimeUpdate}
+            vastTagUrl={exoClickAdConfig.videoDetail.vastTagUrl}
           />
+          ) : (
+            <HlsVideo
+              src={video.videoUrl}
+              poster={video.thumbnailUrl}
+              className="w-full h-auto rounded-lg shadow-lg"
+              onTimeUpdate={handleTimeUpdate}
+            />
+          )}
         </div>
 
         {/* Title & metadata */}
         <div className="max-w-4xl mx-auto text-white space-y-1">
           <h1 className="text-3xl font-bold">{video.title}</h1>
           <p className="text-sm text-gray-400">
-            By {authorName} • {formattedViews} views • {formattedReviews} reviews
+            By {authorName} • {formattedViews} views • {formattedReviews}{" "}
+            reviews
           </p>
           {video.description && (
             <p className="mt-2 text-gray-200">{video.description}</p>
           )}
         </div>
+
+        {/* {shouldShowAd && (
+          <div className="max-w-4xl mx-auto my-6 flex justify-center">
+            <ExoClickAd
+              zoneId={videoAdConfig.zoneId}
+              width={videoAdConfig.width}
+              height={videoAdConfig.height}
+              className="inline-block"
+              style={
+                videoAdConfig.width && videoAdConfig.height
+                  ? {
+                      width: videoAdConfig.width,
+                      height: videoAdConfig.height,
+                    }
+                  : undefined
+              }
+            />
+          </div>
+        )} */}
 
         {/* Recommended Videos */}
         {!recsLoading && recsData?.results?.length > 0 && (
