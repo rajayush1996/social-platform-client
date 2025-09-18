@@ -18,8 +18,7 @@ import Hls from "hls.js";
 import SEO from "@/components/SEO";
 import { exoClickAdConfig } from "@/config/ads.config";
 import VideoWithAds from "@/components/ads/VideoWithAds";
-// import ExoClickAd from "@/components/ads/ExoClickAd";
-// import { exoClickAdConfig } from "@/config/ads.config";
+import ExoClickAd from "@/components/ads/ExoClickAd";
 
 // HLS‐aware <video> wrapper
 type HlsVideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & {
@@ -104,8 +103,13 @@ export default function VideoDetail() {
   // }, [id]);
 
   const VIEW_INCREMENT_THRESHOLD = 20; // seconds of watch time before counting a view
-  // const videoAdConfig = exoClickAdConfig.videoDetail;
-  // const shouldShowAd = Boolean(videoAdConfig.zoneId);
+  const [instreamTag] = useState(
+    () => exoClickAdConfig.videoDetail.instream.getRandomTag()
+  );
+  const shouldUseInstream = Boolean(instreamTag?.vastTagUrl);
+
+  const videoBannerConfig = exoClickAdConfig.videoDetail.banner;
+  const shouldShowAd = Boolean(videoBannerConfig.zoneId);
 
   const handleTimeUpdate = (e: SyntheticEvent<HTMLVideoElement>) => {
     if (
@@ -168,12 +172,12 @@ export default function VideoDetail() {
 
         {/* Video Container with auto-scroll ref */}
         <div ref={containerRef} tabIndex={0} className="max-w-4xl mx-auto mb-6">
-          {exoClickAdConfig.videoDetail.vastTagUrl ? (
-          <VideoWithAds
-            videoUrl={video.videoUrl}
-            poster={video.thumbnailUrl}
-            vastTagUrl={exoClickAdConfig.videoDetail.vastTagUrl}
-          />
+          {shouldUseInstream ? (
+            <VideoWithAds
+              videoUrl={video.videoUrl}
+              poster={video.thumbnailUrl}
+              vastTagUrl={instreamTag!.vastTagUrl}
+            />
           ) : (
             <HlsVideo
               src={video.videoUrl}
@@ -196,24 +200,24 @@ export default function VideoDetail() {
           )}
         </div>
 
-        {/* {shouldShowAd && (
+        {shouldShowAd && (
           <div className="max-w-4xl mx-auto my-6 flex justify-center">
             <ExoClickAd
-              zoneId={videoAdConfig.zoneId}
-              width={videoAdConfig.width}
-              height={videoAdConfig.height}
+              zoneId={videoBannerConfig.zoneId}
+              width={videoBannerConfig.width}
+              height={videoBannerConfig.height}
               className="inline-block"
               style={
-                videoAdConfig.width && videoAdConfig.height
+                videoBannerConfig.width && videoBannerConfig.height
                   ? {
-                      width: videoAdConfig.width,
-                      height: videoAdConfig.height,
+                      width: videoBannerConfig.width,
+                      height: videoBannerConfig.height,
                     }
                   : undefined
               }
             />
           </div>
-        )} */}
+        )}
 
         {/* Recommended Videos */}
         {!recsLoading && recsData?.results?.length > 0 && (

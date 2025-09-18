@@ -6,6 +6,8 @@ import AgeConsentCard from './AgeConsentCard';
 import CookieConsentCard from './CookieConsentCard';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import ExoClickAd from '@/components/ads/ExoClickAd';
+import { exoClickAdConfig } from '@/config/ads.config';
 
 interface LayoutProps {
   children: ReactNode;
@@ -22,6 +24,20 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
   const [headerHeight, setHeaderHeight] = useState(0);
   const location = useLocation();
   const isReels = location.pathname === '/reels';
+
+  const { sideLeft, sideRight, mobileBanner } = exoClickAdConfig;
+  const [hideLeftAd, setHideLeftAd] = useState(false);
+  const [hideRightAd, setHideRightAd] = useState(false);
+  const [hideMobileAd, setHideMobileAd] = useState(false);
+  const showLeftAd = Boolean(sideLeft.zoneId) && !hideLeftAd;
+  const showRightAd = Boolean(sideRight.zoneId) && !hideRightAd;
+  const showMobileAd = Boolean(mobileBanner.zoneId) && !hideMobileAd;
+
+  useEffect(() => {
+    setHideLeftAd(false);
+    setHideRightAd(false);
+    setHideMobileAd(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const ageDone = localStorage.getItem('ageConsented');
@@ -95,6 +111,82 @@ const Layout = ({ children, hideFooter = false }: LayoutProps) => {
         <div ref={navRef}>
           <Navbar />
         </div>
+
+        {!isReels && (
+          <>
+            {showLeftAd && (
+              <div
+                className="fixed left-4 top-0 hidden xl:block z-[60]"
+                style={{ top: headerHeight + 16 }}
+              >
+                <div className="relative rounded-lg bg-background/80 p-2 shadow-lg">
+                  <button
+                    type="button"
+                    aria-label="Close advertisement"
+                    onClick={() => setHideLeftAd(true)}
+                    className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs font-bold text-white transition hover:bg-black/80"
+                  >
+                    ×
+                  </button>
+                  <ExoClickAd
+                    zoneId={sideLeft.zoneId}
+                    width={sideLeft.width}
+                    height={sideLeft.height}
+                    title="Advertisement - Left"
+                  />
+                </div>
+              </div>
+            )}
+
+            {showRightAd && (
+              <div
+                className="fixed top-0 hidden xl:block z-[60]"
+                style={{
+                  top: headerHeight + 16,
+                  right: '1rem',
+                }}
+              >
+                <div className="relative rounded-lg bg-background/80 p-2 shadow-lg">
+                  <button
+                    type="button"
+                    aria-label="Close advertisement"
+                    onClick={() => setHideRightAd(true)}
+                    className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs font-bold text-white transition hover:bg-black/80"
+                  >
+                    ×
+                  </button>
+                  <ExoClickAd
+                    zoneId={sideRight.zoneId}
+                    width={sideRight.width}
+                    height={sideRight.height}
+                    title="Advertisement - Right"
+                  />
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {!isReels && showMobileAd && (
+          <div className="fixed left-1/2 top-1/2 z-[60] flex w-full max-w-[360px] -translate-x-1/2 -translate-y-1/2 justify-center px-4 xl:hidden">
+            <div className="relative w-full rounded-xl bg-background/85 p-2 shadow-xl">
+              <button
+                type="button"
+                aria-label="Close advertisement"
+                onClick={() => setHideMobileAd(true)}
+                className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs font-bold text-white transition hover:bg-black/80"
+              >
+                ×
+              </button>
+              <ExoClickAd
+                zoneId={mobileBanner.zoneId}
+                width={mobileBanner.width}
+                height={mobileBanner.height}
+                title="Advertisement - Mobile"
+              />
+            </div>
+          </div>
+        )}
 
         <main className="flex-grow" style={{ paddingTop: `var(--header-height)` }}>
           {children}
